@@ -1,12 +1,20 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const mongoose = require("mongoose");
+
 const app = express();
 
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  res.status(200).json({ message: "Test successfully" });
-});
+const adminRoutes = require("./routes/admin");
+app.use("/admin", adminRoutes);
 
-app.listen(3000);
+mongoose
+  .connect(
+    "mongodb+srv://studentapp:cPDyYQIXm3ZRLFqv@cluster0.9srxm.mongodb.net/studentapp?retryWrites=true&w=majority"
+  )
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => console.log(err));
