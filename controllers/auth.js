@@ -4,10 +4,6 @@ const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const sgMail = require("@sendgrid/mail");
 
-sgMail.setApiKey(
-  "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"
-);
-
 const Account = require("../models/account");
 const Subject = require("../models/subject");
 const TeacherRole = require("../models/teacherRole");
