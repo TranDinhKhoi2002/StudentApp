@@ -7,8 +7,28 @@ const app = express();
 
 app.use(bodyParser.json());
 
-const adminRoutes = require("./routes/admin");
-app.use("/admin", adminRoutes);
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
+const authRoutes = require("./routes/auth");
+app.use("/auth", authRoutes);
+
+app.use((err, req, res, next) => {
+  const { statusCode, message, data } = err;
+  res.status(statusCode).json({ message, data });
+});
 
 mongoose
   .connect(

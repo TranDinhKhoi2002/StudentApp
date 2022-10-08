@@ -12,6 +12,11 @@ const teacherSchema = new Schema({
     ref: "TeacherRole",
     required: true,
   },
+  account: {
+    type: Schema.Types.ObjectId,
+    ref: "Account",
+    required: true,
+  },
   name: {
     type: String,
     required: true,

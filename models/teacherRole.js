@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const teacherRole = new Schema({
   name: {
     type: String,
-    enum: ["Giáo viên bộ môn", "Giáo viên chủ nhiệm", "Trưởng bộ môn"],
+    enum: ["Giáo viên bộ môn", "Giáo viên chủ nhiệm"],
     required: true,
   },
 });
