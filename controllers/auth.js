@@ -67,40 +67,51 @@ exports.signup = async (req, res, next) => {
     birthday,
   } = req.body;
 
-  const existingAccount = await Account.findOne({ username });
-  if (existingAccount) {
-    return res.status(422).json({ message: "Tên đăng nhập đã tồn tại" });
+  try {
+    const existingAccount = await Account.findOne({ username });
+    if (existingAccount) {
+      return res.status(422).json({ message: "Tên đăng nhập đã tồn tại" });
+    }
+
+    const hashedPassword = bcryptjs.hashSync(password, 12);
+    const account = new Account({ username, password: hashedPassword });
+    await account.save();
+
+    const existingSubject = await Subject.findOne({ _id: subject });
+    if (!existingSubject) {
+      return res.status(422).json({ message: "Môn học không tồn tại" });
+    }
+
+    const existingTeacherRole = await TeacherRole.findOne({ _id: role });
+    if (!existingTeacherRole) {
+      return res.status(422).json({ message: "Vai trò không tồn tại" });
+    }
+
+    const teacher = new Teacher({
+      subject,
+      role,
+      account: account._id.toString(),
+      name,
+      address,
+      email,
+      phone,
+      gender,
+      birthday,
+    });
+    await teacher.save();
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại");
+    error.statusCode = 500;
+    next(error);
   }
-
-  const hashedPassword = bcryptjs.hashSync(password, 12);
-  const account = new Account({ username, password: hashedPassword });
-  await account.save();
-
-  const existingSubject = await Subject.findOne({ _id: subject });
-  if (!existingSubject) {
-    return res.status(422).json({ message: "Môn học không tồn tại" });
-  }
-
-  const existingTeacherRole = await TeacherRole.findOne({ _id: role });
-  if (!existingTeacherRole) {
-    return res.status(422).json({ message: "Vai trò không tồn tại" });
-  }
-
-  const teacher = new Teacher({
-    subject,
-    role,
-    account: account._id.toString(),
-    name,
-    address,
-    email,
-    phone,
-    gender,
-    birthday,
-  });
-  await teacher.save();
 };
 
 exports.resetPassword = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ message: errors.array()[0].msg });
+  }
+
   crypto.randomBytes(32, async (err, buffer) => {
     if (err) {
       return res
@@ -128,12 +139,11 @@ exports.resetPassword = async (req, res, next) => {
 
       sgMail.send({
         to: req.body.email,
-        from: "trandinhkhoi102@gmail.com",
-        subject: "Reset Password For Student App",
-        html: `
-          <p>Bạn vừa gửi yêu cầu khôi phục mật khẩu</p>
-          <p>Click vào <a href='http://localhost:3000/reset-password/${token}'>link</a> này để tạo mật khẩu mới</p>
-        `,
+        from: "20520224@gm.uit.edu.vn",
+        templateId: "d-3cc682a534ca49c6bb7bca00f76555a3",
+        dynamicTemplateData: {
+          token: token,
+        },
       });
 
       res
@@ -145,4 +155,34 @@ exports.resetPassword = async (req, res, next) => {
       next(error);
     }
   });
+};
+
+exports.changePassword = async (req, res, next) => {
+  const { password: newPassword, passwordToken, accountId } = req.body;
+
+  try {
+    const account = await Account.findOne({
+      resetToken: passwordToken,
+      resetTokenExpiration: { $gt: Date.now() },
+      _id: accountId,
+    });
+
+    if (!account) {
+      return res
+        .status(404)
+        .json({ message: "Tài khoản không tồn tại hoặc link đã hết thời hạn" });
+    }
+
+    const hashedPassword = bcryptjs.hashSync(newPassword, 12);
+    account.password = hashedPassword;
+    account.resetToken = undefined;
+    account.resetTokenExpiration = undefined;
+    await account.save();
+
+    res.status(201).json({ message: "Thay đổi mật khẩu thành công" });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
 };

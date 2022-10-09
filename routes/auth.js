@@ -50,4 +50,24 @@ router.post(
   authController.signup
 );
 
+router.post(
+  "/reset-password",
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Email không hợp lệ")
+      .custom((value, { req }) => {
+        return Teacher.findOne({ email: value }).then((teacherDoc) => {
+          if (!teacherDoc) {
+            return Promise.reject("Email không tồn tại");
+          }
+        });
+      })
+      .normalizeEmail(),
+  ],
+  authController.resetPassword
+);
+
+router.post("/change-password", authController.changePassword);
+
 module.exports = router;
