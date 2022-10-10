@@ -15,14 +15,14 @@ exports.login = async (req, res, next) => {
 
     const account = await Account.findOne({ username });
     if (!account) {
-      const error = new Error("No accounts found");
+      const error = new Error("Tên đăng nhập không tồn tại");
       error.statusCode = 401;
       return next(error);
     }
 
     const isValidPassword = bcryptjs.compareSync(password, account.password);
     if (!isValidPassword) {
-      const error = new Error("Password is incorrect");
+      const error = new Error("Mật khẩu không đúng");
       error.statusCode = 401;
       return next(error);
     }
@@ -48,26 +48,26 @@ exports.login = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: errors.array()[0].msg,
-      validationErrors: errors.array(),
-    });
+    const error = new Error(errors.array()[0].msg);
+    error.statusCode = 422;
+    error.validationErrors = errors.array();
+    return next(error);
   }
 
-  const {
-    username,
-    password,
-    subject,
-    role,
-    name,
-    address,
-    email,
-    phone,
-    gender,
-    birthday,
-  } = req.body;
-
   try {
+    const {
+      username,
+      password,
+      subject,
+      role,
+      name,
+      address,
+      email,
+      phone,
+      gender,
+      birthday,
+    } = req.body;
+
     const existingAccount = await Account.findOne({ username });
     if (existingAccount) {
       return res.status(422).json({ message: "Tên đăng nhập đã tồn tại" });
@@ -100,7 +100,7 @@ exports.signup = async (req, res, next) => {
     });
     await teacher.save();
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại");
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;
     next(error);
   }
@@ -109,7 +109,10 @@ exports.signup = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({ message: errors.array()[0].msg });
+    const error = new Error(errors.array()[0].msg);
+    error.statusCode = 422;
+    error.validationErrors = errors.array();
+    return next(error);
   }
 
   crypto.randomBytes(32, async (err, buffer) => {
@@ -158,9 +161,9 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
-  const { password: newPassword, passwordToken, accountId } = req.body;
-
   try {
+    const { password: newPassword, passwordToken, accountId } = req.body;
+
     const account = await Account.findOne({
       resetToken: passwordToken,
       resetTokenExpiration: { $gt: Date.now() },

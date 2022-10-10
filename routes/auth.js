@@ -31,7 +31,7 @@ router.post(
       .isEmail()
       .withMessage("Email không hợp lệ")
       .custom((value, { req }) => {
-        return Teacher.find({ email: value }).then((teacherDoc) => {
+        return Teacher.findOne({ email: value }).then((teacherDoc) => {
           if (teacherDoc) {
             return Promise.reject("Email đã tồn tại, vui lòng chọn email khác");
           }

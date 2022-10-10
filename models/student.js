@@ -11,6 +11,11 @@ const studentSchema = new Schema({
     type: String,
     required: true,
   },
+  avatar: {
+    type: String,
+    default:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLoUF9n_TO-StQ0bXzcE6KaF5uCIPnKAUZhqlwi3Ogl0GVJsnmij3p2AtqG5KWXhGpito&usqp=CAU",
+  },
   gender: {
     type: String,
     enum: ["Nam", "Nữ"],
@@ -36,7 +41,6 @@ const studentSchema = new Schema({
     type: String,
     enum: ["Đang học", "Đã tốt nghiệp", "Đã nghỉ học"],
     default: "Đang học",
-    required: true,
   },
 });
 

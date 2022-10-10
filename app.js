@@ -2,6 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
+const multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 
@@ -22,12 +24,38 @@ app.use((req, res, next) => {
   next();
 });
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, uuidv4() + "-" + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
+
 const authRoutes = require("./routes/auth");
+const studentRoutes = require("./routes/student");
+
 app.use("/auth", authRoutes);
+app.use("/student", studentRoutes);
 
 app.use((err, req, res, next) => {
-  const { statusCode, message, data } = err;
-  res.status(statusCode).json({ message, data });
+  const { statusCode, message, data, validationErrors } = err;
+  res.status(statusCode).json({ message, data, validationErrors });
 });
 
 mongoose
