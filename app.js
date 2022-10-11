@@ -5,7 +5,12 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 
+const helmet = require("helmet");
+const compression = require("compression");
+
 const app = express();
+
+console.log(process.env.NODE_ENV);
 
 app.use(bodyParser.json());
 
@@ -50,6 +55,9 @@ app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 
+app.use(helmet());
+app.use(compression());
+
 app.use("/auth", authRoutes);
 app.use("/student", studentRoutes);
 
@@ -58,11 +66,12 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({ message, data, validationErrors });
 });
 
+// `mongodb+srv://studentapp:cPDyYQIXm3ZRLFqv@cluster0.9srxm.mongodb.net/studentapp?retryWrites=true&w=majority`
 mongoose
   .connect(
-    "mongodb+srv://studentapp:cPDyYQIXm3ZRLFqv@cluster0.9srxm.mongodb.net/studentapp?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.9srxm.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
   )
   .then((result) => {
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
   })
   .catch((err) => console.log(err));

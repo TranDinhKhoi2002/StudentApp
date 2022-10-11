@@ -67,4 +67,6 @@ router.put(
   studentController.updateStudent
 );
 
+router.delete("/student/:studentId", isAuth, studentController.deleteStudent);
+
 module.exports = router;
