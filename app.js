@@ -49,9 +49,11 @@ app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
+const subjectRoutes = require("./routes/subject");
 
 app.use("/auth", authRoutes);
 app.use("/student", studentRoutes);
+app.use("/subject", subjectRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;
