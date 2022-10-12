@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const Subject = require("../models/subject");
+const Teacher = require("../models/teacher")
 
 exports.createSubject = async (req, res, next) => {
   const errors = validationResult(req);
@@ -64,8 +65,14 @@ exports.deleteSubject = async (req, res, next) => {
         error.statusCode = 404;
         return next(error);
       }
-      await Subject.findByIdAndRemove(subjectId);
-      res.status(200).json({ message: "Xóa môn học thành công" });
+      const teachers = await Teacher.findOne({subject: subjectId})
+      if(teachers){
+        res.status(400).json({ message: "Môn học vẫn đang được giảng dạy, vui lòng chỉnh sửa thông tin giáo viên trước khi xóa môn học" });
+      }
+      else{
+        await Subject.findByIdAndRemove(subjectId);
+        res.status(200).json({ message: "Xóa môn học thành công" });
+      }
     } catch (err) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
       error.statusCode = 500;
