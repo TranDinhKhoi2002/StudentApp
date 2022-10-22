@@ -17,7 +17,7 @@ const classSchema = new Schema({
     required: true,
   },
   schoolYear: {
-    type: String,
+    type: Number,
     required: true,
   },
   students: [

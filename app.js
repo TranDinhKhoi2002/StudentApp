@@ -10,8 +10,6 @@ const compression = require("compression");
 
 const app = express();
 
-console.log(process.env.NODE_ENV);
-
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -54,12 +52,14 @@ app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
+const classRoutes = require("./routes/class");
 
 app.use(helmet());
 app.use(compression());
 
 app.use("/auth", authRoutes);
-app.use("/student", studentRoutes);
+app.use(studentRoutes);
+app.use(classRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;

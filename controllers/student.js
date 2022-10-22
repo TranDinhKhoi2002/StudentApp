@@ -2,17 +2,9 @@ const { validationResult } = require("express-validator");
 
 const Student = require("../models/student");
 const Class = require("../models/class");
-const Staff = require("../models/staff");
 const fileHelper = require("../util/file");
 
-const checkStaffRole = async (accountId) => {
-  const existingStaff = await Staff.findOne({ account: accountId });
-
-  if (existingStaff) {
-    return true;
-  }
-  return false;
-};
+const { checkRole } = require("../util/checkRole");
 
 exports.createStudent = async (req, res, next) => {
   const errors = validationResult(req);
@@ -26,10 +18,10 @@ exports.createStudent = async (req, res, next) => {
   const { className, name, gender, birthday, address, email, phone } = req.body;
 
   try {
-    const isStaff = await checkStaffRole(req.accountId);
-    if (!isStaff) {
+    const isAuthorized = await checkRole(req.accountId);
+    if (!isAuthorized) {
       const error = new Error(
-        "Chỉ có nhân viên giáo vụ mới được thêm học sinh"
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
       );
       error.statusCode = 401;
       return next(error);
@@ -88,8 +80,8 @@ exports.updateStudent = async (req, res, next) => {
   }
 
   try {
-    const isStaff = await checkStaffRole(req.accountId);
-    if (!isStaff) {
+    const isAuthorized = await checkRole(req.accountId);
+    if (!isAuthorized) {
       const error = new Error(
         "Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh"
       );
@@ -130,10 +122,10 @@ exports.deleteStudent = async (req, res, next) => {
   const studentId = req.params.studentId;
 
   try {
-    const isStaff = await checkStaffRole(req.accountId);
-    if (!isStaff) {
+    const isAuthorized = await checkRole(req.accountId);
+    if (!isAuthorized) {
       const error = new Error(
-        "Chỉ có nhân viên giáo vụ mới được thêm học sinh"
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
       );
       error.statusCode = 401;
       return next(error);
@@ -158,6 +150,44 @@ exports.deleteStudent = async (req, res, next) => {
     await className.save();
 
     res.status(200).json({ message: "Xoá học sinh thành công" });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.getStudents = async (req, res, next) => {
+  const { classId } = req.params;
+
+  try {
+    const _class = await Class.findById(classId);
+    if (!_class) {
+      const error = new Error("Lớp học không tồn tại");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ students: _class.students });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.getStudent = async (req, res, next) => {
+  const studentId = req.params.studentId;
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student) {
+      const error = new Error("Học sinh không tồn tại");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ student });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;

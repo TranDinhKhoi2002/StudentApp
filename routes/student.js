@@ -7,8 +7,12 @@ const isAuth = require("../middleware/is-auth");
 
 const Student = require("../models/student");
 
+router.get("/students/:classId", isAuth, studentController.getStudents);
+
+router.get("/students/:studentId", isAuth, studentController.getStudent);
+
 router.post(
-  "/student",
+  "/students",
   isAuth,
   [
     body("className").isMongoId().withMessage("Lớp không hợp lệ"),
@@ -38,7 +42,7 @@ router.post(
 );
 
 router.put(
-  "/student/:studentId",
+  "/students/:studentId",
   isAuth,
   [
     body("className").isMongoId().withMessage("Lớp không hợp lệ"),
@@ -67,6 +71,6 @@ router.put(
   studentController.updateStudent
 );
 
-router.delete("/student/:studentId", isAuth, studentController.deleteStudent);
+router.delete("/students/:studentId", isAuth, studentController.deleteStudent);
 
 module.exports = router;
