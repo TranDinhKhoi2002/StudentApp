@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "engines": {
+    "node": "16.13.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "SET NODE_ENV=development&&SET MONGO_USER=studentapp&&SET MONGO_PASSWORD=cPDyYQIXm3ZRLFqv&&SET MONGO_DATABASE=studentapp&&SET SG_API_KEY=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&&node app.js",
