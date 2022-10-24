@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-const https = require("https");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -58,6 +57,7 @@ app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 const classRoutes = require("./routes/class");
+const scoreRoutes = require("./routes/score");
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, "access.log"),
@@ -73,6 +73,7 @@ app.use(morgan("combined", { stream: accessLogStream }));
 app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(classRoutes);
+app.use(scoreRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;

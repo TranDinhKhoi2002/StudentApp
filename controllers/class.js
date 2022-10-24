@@ -1,6 +1,8 @@
 const Class = require("../models/class");
 
-const { checkRole } = require("../util/checkRole");
+const {
+  checkStaffAndPrincipalRole,
+} = require("../util/checkStaffAndPrincipalRole");
 
 exports.createClass = async (req, res, next) => {
   const errors = validationResult(req);
@@ -13,7 +15,7 @@ exports.createClass = async (req, res, next) => {
 
   const { grade, teacher, name, schoolYear } = req.body;
   try {
-    const isAuthorized = await checkRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
       const error = new Error(
         "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
@@ -50,7 +52,7 @@ exports.updateClass = async (req, res, next) => {
   const { grade, teacher, name, schoolYear } = req.body;
   const classId = req.params.classId;
   try {
-    const isAuthorized = await checkRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
       const error = new Error(
         "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"

@@ -4,7 +4,9 @@ const Student = require("../models/student");
 const Class = require("../models/class");
 const fileHelper = require("../util/file");
 
-const { checkRole } = require("../util/checkRole");
+const {
+  checkStaffAndPrincipalRole,
+} = require("../util/checkStaffAndPrincipalRole");
 
 exports.createStudent = async (req, res, next) => {
   const errors = validationResult(req);
@@ -18,7 +20,7 @@ exports.createStudent = async (req, res, next) => {
   const { className, name, gender, birthday, address, email, phone } = req.body;
 
   try {
-    const isAuthorized = await checkRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
       const error = new Error(
         "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
@@ -80,7 +82,7 @@ exports.updateStudent = async (req, res, next) => {
   }
 
   try {
-    const isAuthorized = await checkRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
       const error = new Error(
         "Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh"
@@ -122,7 +124,7 @@ exports.deleteStudent = async (req, res, next) => {
   const studentId = req.params.studentId;
 
   try {
-    const isAuthorized = await checkRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
       const error = new Error(
         "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"

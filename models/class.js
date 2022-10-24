@@ -20,6 +20,11 @@ const classSchema = new Schema({
     type: Number,
     required: true,
   },
+  semester: {
+    type: Schema.Types.ObjectId,
+    ref: "Semester",
+    required: true,
+  },
   students: [
     {
       type: Schema.Types.ObjectId,
