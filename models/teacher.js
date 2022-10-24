@@ -36,6 +36,7 @@ const teacherSchema = new Schema({
   },
   gender: {
     type: String,
+    enum: ["Nam", "Nữ"],
     required: true,
   },
   birthday: {
