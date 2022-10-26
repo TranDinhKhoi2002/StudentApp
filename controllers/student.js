@@ -69,17 +69,6 @@ exports.updateStudent = async (req, res, next) => {
 
   const studentId = req.params.studentId;
   const { className, name, gender, birthday, address, email, phone } = req.body;
-  let avatarUrl = req.body.image;
-
-  if (req.file) {
-    avatarUrl = req.file.path.replace("\\", "/");
-  }
-
-  if (!avatarUrl) {
-    const error = new Error("Vui lòng chọn hình ảnh");
-    error.statusCode = 422;
-    return next(error);
-  }
 
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -96,10 +85,6 @@ exports.updateStudent = async (req, res, next) => {
       const error = new Error("Học sinh không tồn tại");
       error.statusCode = 404;
       return next(error);
-    }
-
-    if (avatarUrl !== student.avatar) {
-      fileHelper.deleteFile(student.avatar);
     }
 
     student.className = className;

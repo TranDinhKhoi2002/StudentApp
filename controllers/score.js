@@ -1,4 +1,4 @@
-const Score = require("../models/score");
+const Score = require("../models/studentScore");
 
 exports.getScores = async (req, res, next) => {
   const { studentId, subjectId, semesterId, schoolYear } = req.query;

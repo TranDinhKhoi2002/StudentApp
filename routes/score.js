@@ -29,7 +29,7 @@ router.patch(
     body("studentId", "Mã số học sinh không hợp lệ").isMongoId(),
     body("subjectId", "Mã môn học không hợp lệ").isMongoId(),
     body("semesterId", "Mã học kỳ không hợp lệ").isMongoId(),
-    body("schoolYear").isString().withMessage("Năm học phải là chuỗi"),
+    body("schoolYear").isNumeric().withMessage("Năm học phải là số"),
   ],
   scoreController.updateScore
 );
