@@ -1,12 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const teacherSchema = new Schema({
-  subject: {
-    type: Schema.Types.ObjectId,
-    ref: "Subject",
-    required: true,
-  },
+const staffSchema = new Schema({
   role: {
     type: Schema.Types.ObjectId,
     ref: "Role",
@@ -43,4 +38,4 @@ const teacherSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("Teacher", teacherSchema);
+module.exports = mongoose.model("Staff", staffSchema);

@@ -1,6 +1,18 @@
 const { validationResult } = require("express-validator");
+
 const Student = require("../models/student");
 const Class = require("../models/class");
+const Staff = require("../models/staff");
+const fileHelper = require("../util/file");
+
+const checkStaffRole = async (accountId) => {
+  const existingStaff = await Staff.findOne({ account: accountId });
+
+  if (existingStaff) {
+    return true;
+  }
+  return false;
+};
 
 exports.createStudent = async (req, res, next) => {
   const errors = validationResult(req);
@@ -14,6 +26,15 @@ exports.createStudent = async (req, res, next) => {
   const { className, name, gender, birthday, address, email, phone } = req.body;
 
   try {
+    const isStaff = await checkStaffRole(req.accountId);
+    if (!isStaff) {
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ mới được thêm học sinh"
+      );
+      error.statusCode = 401;
+      return next(error);
+    }
+
     const selectedClass = await Class.findById(className);
     if (!selectedClass) {
       const error = new Error("Lớp không tồn tại");
@@ -67,17 +88,76 @@ exports.updateStudent = async (req, res, next) => {
   }
 
   try {
+    const isStaff = await checkStaffRole(req.accountId);
+    if (!isStaff) {
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh"
+      );
+      error.statusCode = 401;
+      return next(error);
+    }
+
     const student = await Student.findById(studentId);
     if (!student) {
       const error = new Error("Học sinh không tồn tại");
       error.statusCode = 404;
       return next(error);
     }
-    // Check whether user is staff or not
 
     if (avatarUrl !== student.avatar) {
-      // Delete old avatar
+      fileHelper.deleteFile(student.avatar);
     }
+
+    student.className = className;
+    student.name = name;
+    student.gender = gender;
+    student.birthday = birthday;
+    student.address = address;
+    student.email = email;
+    student.phone = phone;
+    student.avatar = avatarUrl;
+    await student.save();
+
+    res.status(201).json({ message: "Cập nhật học sinh thành công" });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.deleteStudent = async (req, res, next) => {
+  const studentId = req.params.studentId;
+
+  try {
+    const isStaff = await checkStaffRole(req.accountId);
+    if (!isStaff) {
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ mới được thêm học sinh"
+      );
+      error.statusCode = 401;
+      return next(error);
+    }
+
+    const student = await Student.findById(studentId);
+    const classNameId = student.className.toString();
+    if (!student) {
+      const error = new Error("Học sinh không tồn tại");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    if (student.avatar.startsWith("/images")) {
+      fileHelper.deleteFile(student.avatar);
+    }
+
+    await Student.findByIdAndRemove(studentId);
+
+    const className = await Class.findById(classNameId);
+    className.students.pull(studentId);
+    await className.save();
+
+    res.status(200).json({ message: "Xoá học sinh thành công" });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;

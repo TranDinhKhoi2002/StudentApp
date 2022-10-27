@@ -4,15 +4,17 @@ const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const sgMail = require("@sendgrid/mail");
 
+sgMail.setApiKey(process.env.SG_API_KEY);
+
 const Account = require("../models/account");
 const Subject = require("../models/subject");
-const TeacherRole = require("../models/teacherRole");
+const TeacherRole = require("../models/role");
 const Teacher = require("../models/teacher");
 
 exports.login = async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
+  try {
     const account = await Account.findOne({ username });
     if (!account) {
       const error = new Error("Tên đăng nhập không tồn tại");
@@ -54,20 +56,20 @@ exports.signup = async (req, res, next) => {
     return next(error);
   }
 
-  try {
-    const {
-      username,
-      password,
-      subject,
-      role,
-      name,
-      address,
-      email,
-      phone,
-      gender,
-      birthday,
-    } = req.body;
+  const {
+    username,
+    password,
+    subject,
+    role,
+    name,
+    address,
+    email,
+    phone,
+    gender,
+    birthday,
+  } = req.body;
 
+  try {
     const existingAccount = await Account.findOne({ username });
     if (existingAccount) {
       return res.status(422).json({ message: "Tên đăng nhập đã tồn tại" });
@@ -161,9 +163,9 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
-  try {
-    const { password: newPassword, passwordToken, accountId } = req.body;
+  const { password: newPassword, passwordToken, accountId } = req.body;
 
+  try {
     const account = await Account.findOne({
       resetToken: passwordToken,
       resetTokenExpiration: { $gt: Date.now() },
