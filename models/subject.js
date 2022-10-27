@@ -15,9 +15,9 @@ const subjectSchema = new Schema({
   teachers: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Teacher"
-    }
-  ]
+      ref: "Teacher",
+    },
+  ],
 });
 
 module.exports = mongoose.model("Subject", subjectSchema);

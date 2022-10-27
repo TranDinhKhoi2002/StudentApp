@@ -1,3 +1,6 @@
+const path = require("path");
+const fs = require("fs");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -7,10 +10,9 @@ const { v4: uuidv4 } = require("uuid");
 
 const helmet = require("helmet");
 const compression = require("compression");
+const morgan = require("morgan");
 
 const app = express();
-
-console.log(process.env.NODE_ENV);
 
 app.use(bodyParser.json());
 
@@ -29,51 +31,64 @@ app.use((req, res, next) => {
   next();
 });
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, uuidv4() + "-" + file.originalname);
-  },
-});
+// const fileStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "images");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, uuidv4() + "-" + file.originalname);
+//   },
+// });
 
-const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
+// const fileFilter = (req, file, cb) => {
+//   if (
+//     file.mimetype === "image/png" ||
+//     file.mimetype === "image/jpg" ||
+//     file.mimetype === "image/jpeg"
+//   ) {
+//     cb(null, true);
+//   } else {
+//     cb(null, false);
+//   }
+// };
 
-app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
+// app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
-const subjectRoutes = require("./routes/subject");
+const classRoutes = require("./routes/class");
+const scoreRoutes = require("./routes/score");
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert");
 
 app.use(helmet());
 app.use(compression());
+app.use(morgan("combined", { stream: accessLogStream }));
 
 app.use("/auth", authRoutes);
-app.use("/student", studentRoutes);
-app.use("/subject", subjectRoutes);
+app.use(studentRoutes);
+app.use(classRoutes);
+app.use(scoreRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;
   res.status(statusCode).json({ message, data, validationErrors });
 });
 
-// `mongodb+srv://studentapp:cPDyYQIXm3ZRLFqv@cluster0.9srxm.mongodb.net/studentapp?retryWrites=true&w=majority`
 mongoose
   .connect(
     `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.9srxm.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
   )
   .then((result) => {
+    // https
+    //   .createServer({ key: privateKey, cert: certificate }, app)
+    //   .listen(process.env.PORT || 3000);
+
     app.listen(process.env.PORT || 3000);
   })
   .catch((err) => console.log(err));

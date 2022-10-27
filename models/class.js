@@ -17,13 +17,21 @@ const classSchema = new Schema({
     required: true,
   },
   schoolYear: {
-    type: String,
+    type: Number,
+    required: true,
+  },
+  semester: {
+    type: Schema.Types.ObjectId,
+    ref: "Semester",
     required: true,
   },
   students: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Student",
+      studentId: {
+        type: Schema.Types.ObjectId,
+        ref: "Student",
+        required: true,
+      },
     },
   ],
 });
