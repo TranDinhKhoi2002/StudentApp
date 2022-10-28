@@ -43,6 +43,11 @@ const teacherSchema = new Schema({
     type: Date,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["Đang dạy", "Đã nghỉ"],
+    default: "Đang dạy",
+  },
 });
 
 module.exports = mongoose.model("Teacher", teacherSchema);
