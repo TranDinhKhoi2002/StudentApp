@@ -2,28 +2,17 @@ const express = require("express");
 const { body } = require("express-validator");
 const router = express.Router();
 
-const teacherController = require("../controllers/teacher");
+const staffController = require("../controllers/staff");
 const isAuth = require("../middleware/is-auth");
 const Account = require("../models/account");
 const Role = require("../models/role");
-const Subject = require("../models/subject");
-const Teacher = require("../models/teacher");
+const Staff = require("../models/staff")
 
-router.get("/teachers", isAuth, teacherController.getTeachers);
+router.get("/staffs", isAuth, staffController.getStaffs);
 
-router.get("/teachers/:teacherId", isAuth, teacherController.getTeacher);
+router.get("/staffs/:staffId", isAuth, staffController.getStaff);
 
-const teacherAuthentication = [
-  body("subject")
-    .isMongoId()
-    .withMessage("Mã môn học không hợp lệ")
-    .custom((value, { req }) => {
-      return Subject.findById(value).then((subjectDoc) => {
-        if (!subjectDoc) {
-          return Promise.reject("Môn học không tồn tại");
-        }
-      });
-    }),
+const staffAuthentication = [
   body("role")
     .isMongoId()
     .withMessage("Mã vai trò không hợp lệ")
@@ -31,8 +20,7 @@ const teacherAuthentication = [
       return Role.findById(value).then((roleDoc) => {
         if (
           !roleDoc ||
-          roleDoc.name !== "Giáo viên chủ nhiệm" ||
-          roleDoc.name !== "Giáo viên bộ môn"
+          roleDoc.name !== "Nhân viên giáo vụ"
         ) {
           return Promise.reject("Vai trò không hợp lệ");
         }
@@ -44,8 +32,8 @@ const teacherAuthentication = [
     .isEmail()
     .withMessage("Email không hợp lệ")
     .custom((value, { req }) => {
-      return Teacher.findOne({ email: value }).then((teacherDoc) => {
-        if (teacherDoc) {
+      return Staff.findOne({ email: value }).then((staffDoc) => {
+        if (staffDoc) {
           return Promise.reject("Email đã tồn tại, vui lòng chọn email khác");
         }
       });
@@ -62,7 +50,7 @@ const teacherAuthentication = [
 ];
 
 router.post(
-  "/teachers",
+  "/staffs",
   isAuth,
   [
     body("username")
@@ -77,18 +65,18 @@ router.post(
         });
       }),
     body("password", "Mật khẩu không được để trống").trim().notEmpty(),
-    ...teacherAuthentication,
+    ...staffAuthentication,
   ],
-  teacherController.createTeacher
+  staffController.createStaff
 );
 
 router.post(
-  "/teachers/:teacherId",
+  "/staffs/:staffId",
   isAuth,
-  teacherAuthentication,
-  teacherController.updateTeacher
+  staffAuthentication,
+  staffController.updateStaff
 );
 
-router.delete("/teachers/:teacherId", isAuth, teacherController.deleteTeacher);
+router.delete("/staffs/:staffId", isAuth, staffController.deleteStaff);
 
 module.exports = router;

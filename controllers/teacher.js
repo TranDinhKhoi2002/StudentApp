@@ -169,7 +169,7 @@ exports.deleteTeacher = async (req, res, next) => {
       return next(error);
     }
 
-    const teacher = await teacher.findById(teacherId);
+    const teacher = await Teacher.findById(teacherId);
     if (!teacher) {
       const error = new Error("Giáo viên không tồn tại");
       error.statusCode = 404;
@@ -195,6 +195,8 @@ exports.deleteTeacher = async (req, res, next) => {
     const subject = await Subject.findById(teacher.subject);
     subject.teachers.pull(teacherId);
     await subject.save();
+
+    await Account.findByIdAndRemove(teacher.account)
 
     teacher.status = "Đã nghỉ";
     await teacher.save();
