@@ -13,6 +13,18 @@ exports.checkStaffAndPrincipalRole = async (accountId) => {
   return false;
 };
 
+exports.checkPrincipalRole = async (accountId) => {
+  const existingTeacher = await Teacher.findOne({
+    account: accountId,
+  }).populate("role");
+
+  if (!existingTeacher || existingTeacher.role.name !== "Hiệu trưởng") {
+    return false;
+  }
+
+  return true;
+};
+
 exports.checkTeacherRole = async (accountId) => {
   const existingTeacher = await Teacher.findOne({
     account: accountId,
