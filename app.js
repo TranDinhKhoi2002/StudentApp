@@ -58,6 +58,8 @@ const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 const classRoutes = require("./routes/class");
 const scoreRoutes = require("./routes/score");
+const subjectRoutes = require("./routes/subject");
+const teacherRoutes = require("./routes/teacher")
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, "access.log"),
@@ -74,6 +76,8 @@ app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(classRoutes);
 app.use(scoreRoutes);
+app.use(subjectRoutes);
+app.use(teacherRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;
