@@ -4,9 +4,7 @@ const Student = require("../models/student");
 const Class = require("../models/class");
 const fileHelper = require("../util/file");
 
-const {
-  checkStaffAndPrincipalRole,
-} = require("../util/checkStaffAndPrincipalRole");
+const { checkStaffAndPrincipalRole } = require("../util/checkRoles");
 
 exports.createStudent = async (req, res, next) => {
   const errors = validationResult(req);
