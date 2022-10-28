@@ -1,6 +1,6 @@
 const Class = require("../models/class");
 
-const { checkStaffAndPrincipalRole } = require("../util/checkRoles");
+const { checkStaffAndPrincipalRole } = require("../util/roles");
 
 exports.createClass = async (req, res, next) => {
   const errors = validationResult(req);

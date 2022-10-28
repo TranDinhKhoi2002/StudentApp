@@ -31,3 +31,17 @@ exports.checkTeacherRole = async (accountId) => {
 
   return true;
 };
+
+exports.getRole = async (accountId) => {
+  const existingStaff = await Staff.findOne({ account: accountId }).populate(
+    "role"
+  );
+  if (existingStaff) {
+    return existingStaff.role.name;
+  }
+
+  const existingTeacher = await Teacher.findOne({
+    account: accountId,
+  }).populate("role");
+  return existingTeacher.role.name;
+};

@@ -10,6 +10,7 @@ const Account = require("../models/account");
 const Subject = require("../models/subject");
 const TeacherRole = require("../models/role");
 const Teacher = require("../models/teacher");
+const { getRole } = require("../util/roles");
 
 exports.login = async (req, res, next) => {
   const { username, password } = req.body;
@@ -38,7 +39,9 @@ exports.login = async (req, res, next) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ token, accountId: account._id.toString() });
+    const role = await getRole(account._id.toString());
+
+    res.status(200).json({ token, accountId: account._id.toString(), role });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
