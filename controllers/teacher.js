@@ -180,7 +180,7 @@ exports.deleteTeacher = async (req, res, next) => {
       Class.find(
         {
           _id: { $in: teacher.classes },
-          schoolYear: { $gte: new Date().getFullYear() },
+          schoolYear: new Date().getFullYear(),
         },
         function (err, classes) {
           if (classes.length > 0) {
