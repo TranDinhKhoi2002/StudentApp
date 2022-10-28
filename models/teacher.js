@@ -17,6 +17,7 @@ const teacherSchema = new Schema({
     ref: "Account",
     required: true,
   },
+  classes: [{ type: Schema.Types.ObjectId, ref: "Class" }],
   name: {
     type: String,
     required: true,
@@ -35,11 +36,17 @@ const teacherSchema = new Schema({
   },
   gender: {
     type: String,
+    enum: ["Nam", "Nữ"],
     required: true,
   },
   birthday: {
     type: Date,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["Đang dạy", "Đã nghỉ"],
+    default: "Đang dạy",
   },
 });
 
