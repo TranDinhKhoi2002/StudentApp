@@ -10,6 +10,7 @@ const Account = require("../models/account");
 const Subject = require("../models/subject");
 const TeacherRole = require("../models/role");
 const Teacher = require("../models/teacher");
+const Staff = require("../models/staff");
 const { getRole } = require("../util/roles");
 
 exports.login = async (req, res, next) => {
@@ -131,12 +132,13 @@ exports.resetPassword = async (req, res, next) => {
     const token = buffer.toString("hex");
     try {
       const teacher = await Teacher.findOne({ email: req.body.email });
-      if (!teacher) {
+      const staff = await Staff.findOne({ email: req.body.email });
+      if (!teacher && !staff) {
         return res.status(404).json({ message: "Email không tồn tại" });
       }
 
       const account = await Account.findOne({
-        _id: teacher.account.toString(),
+        _id: teacher.account.toString() || staff.account.toString(),
       });
       if (!account) {
         return res.status(404).json({ message: "Tài khoản không tồn tại" });
