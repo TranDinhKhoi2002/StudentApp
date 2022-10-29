@@ -1,3 +1,6 @@
 ::ffff:127.0.0.1 - - [23/Oct/2022:13:36:33 +0000] "POST /auth/reset-password HTTP/1.1" 200 69 "-" "Thunder Client (https://www.thunderclient.com)"
 ::ffff:127.0.0.1 - - [24/Oct/2022:02:26:36 +0000] "POST /auth/reset-password HTTP/1.1" 200 69 "-" "Thunder Client (https://www.thunderclient.com)"
 ::ffff:127.0.0.1 - - [24/Oct/2022:02:26:43 +0000] "POST /auth/reset-password HTTP/1.1" 200 69 "-" "Thunder Client (https://www.thunderclient.com)"
+::1 - - [29/Oct/2022:08:53:50 +0000] "GET /main.1585bb3ba1b77b1d6453.hot-update.json HTTP/1.1" 404 180 "http://localhost:3000/scores" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+::1 - - [29/Oct/2022:08:53:50 +0000] "GET /scores HTTP/1.1" 401 31 "http://localhost:3000/scores" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+::1 - - [29/Oct/2022:08:53:50 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
