@@ -159,7 +159,10 @@ exports.resetPassword = async (req, res, next) => {
 
       res
         .status(200)
-        .json({ message: "Gửi yêu cầu khôi phục mật khẩu thành công" });
+        .json({
+          message: "Gửi yêu cầu khôi phục mật khẩu thành công",
+          accountId: account._id,
+        });
     } catch (err) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
       error.statusCode = 500;
