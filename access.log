@@ -4,3 +4,4 @@
 ::1 - - [29/Oct/2022:08:53:50 +0000] "GET /main.1585bb3ba1b77b1d6453.hot-update.json HTTP/1.1" 404 180 "http://localhost:3000/scores" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
 ::1 - - [29/Oct/2022:08:53:50 +0000] "GET /scores HTTP/1.1" 401 31 "http://localhost:3000/scores" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
 ::1 - - [29/Oct/2022:08:53:50 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+::1 - - [29/Oct/2022:09:37:52 +0000] "GET / HTTP/1.1" 404 139 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"

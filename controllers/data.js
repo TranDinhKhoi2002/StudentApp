@@ -14,12 +14,9 @@ exports.getData = async (req, res, next) => {
 
     const subjects = await Subject.find();
 
-    const classesName = classes.map((_class) => _class.name);
-    const subjectsName = subjects.map((subject) => subject.name);
-
     res.status(200).json({
-      classes: classesName,
-      subjects: subjectsName,
+      classes,
+      subjects,
       role: teacher.role.name,
     });
   } catch (err) {
