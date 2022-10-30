@@ -1,6 +1,7 @@
 const Staff = require("../models/staff");
 const Subject = require("../models/subject");
 const Teacher = require("../models/teacher");
+const Class = require("../models/class");
 
 exports.getData = async (req, res, next) => {
   const accountId = req.accountId;
@@ -8,7 +9,7 @@ exports.getData = async (req, res, next) => {
 
   const subjects = await Subject.find();
 
-  let classes = [];
+  let classes = await Class.find();
   let role;
   const teacher = await Teacher.findOne({ account: accountId })
     .populate("classes")
