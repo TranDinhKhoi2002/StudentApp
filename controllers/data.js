@@ -5,14 +5,18 @@ const Class = require("../models/class");
 
 exports.getData = async (req, res, next) => {
   const accountId = req.accountId;
-  console.log(accountId);
 
   const subjects = await Subject.find();
 
-  let classes = await Class.find();
+  let classes = await Class.find().populate({
+    path: "students",
+  });
   let role;
   const teacher = await Teacher.findOne({ account: accountId })
-    .populate("classes")
+    .populate({
+      path: "classes",
+      populate: { path: "students" },
+    })
     .populate("role");
   if (teacher) {
     classes = teacher.classes;
