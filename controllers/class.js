@@ -1,3 +1,4 @@
+const { validationResult } = require("express-validator");
 const Class = require("../models/class");
 const Teacher = require("../models/teacher");
 

@@ -36,12 +36,7 @@ exports.generateFakeData = async () => {
   }
 
   const roles = [];
-  [
-    "Hiệu trưởng",
-    "Giáo viên bộ môn",
-    "Giáo viên chủ nhiệm",
-    "Nhân viên giáo vụ",
-  ].map(async (roleName) => {
+  ["Hiệu trưởng", "Giáo viên bộ môn", "Giáo viên chủ nhiệm", "Nhân viên giáo vụ"].forEach(async (roleName) => {
     const role = new Role({
       name: roleName,
       _id: faker.database.mongodbObjectId(),
@@ -51,18 +46,7 @@ exports.generateFakeData = async () => {
   });
 
   const subjects = [];
-  [
-    "Toán",
-    "Lý",
-    "Hóa",
-    "Sinh",
-    "Văn",
-    "Tiếng Anh",
-    "Sử",
-    "Địa",
-    "GDCD",
-    "Tin học",
-  ].map(async (subjectName) => {
+  ["Toán", "Lý", "Hóa", "Sinh", "Văn", "Tiếng Anh", "Sử", "Địa", "GDCD", "Tin học"].forEach(async (subjectName) => {
     const subject = new Subject({
       name: subjectName,
       passScore: 5,
@@ -99,6 +83,28 @@ exports.generateFakeData = async () => {
     });
     await account.save();
 
+    const teacher = new Teacher({
+      subject: subjects[faker.datatype.number({ min: 0, max: 9 })]._id,
+      role: roles[faker.datatype.number({ min: 0, max: 3 })]._id,
+      account: account._id,
+      classes: [],
+      name: faker.name.fullName(),
+      address: faker.address.street() + " " + faker.address.city(),
+      email: faker.internet.email(),
+      phone: faker.phone.number("03########"),
+      gender: sample(["Nam", "Nữ"]),
+      birthday: faker.date.birthdate({ min: 1970, max: 1997, mode: "year" }),
+    });
+    await teacher.save();
+  }
+
+  for (let i = 0; i < 2; i++) {
+    const account = new Account({
+      username: faker.internet.userName(),
+      password: bcryptjs.hashSync("111111", 12),
+    });
+    await account.save();
+
     const classId = faker.database.mongodbObjectId();
 
     const teacher = new Teacher({
@@ -115,9 +121,7 @@ exports.generateFakeData = async () => {
     });
     await teacher.save();
 
-    const studentIds = [...Array(5)].map((_) =>
-      faker.database.mongodbObjectId()
-    );
+    const studentIds = [...Array(5)].map((_) => faker.database.mongodbObjectId());
 
     studentIds.forEach(async (id) => {
       const student = new Student({
@@ -171,15 +175,9 @@ exports.generateFakeData = async () => {
           student: id,
           classScore: classScore._id,
           scores: {
-            oral: [...Array(5)].map((_) =>
-              faker.datatype.float({ min: 0, max: 10, precision: 0.25 })
-            ),
-            m15: [...Array(5)].map((_) =>
-              faker.datatype.float({ min: 0, max: 10, precision: 0.25 })
-            ),
-            m45: [...Array(3)].map((_) =>
-              faker.datatype.float({ min: 0, max: 10, precision: 0.25 })
-            ),
+            oral: [...Array(5)].map((_) => faker.datatype.float({ min: 0, max: 10, precision: 0.25 })),
+            m15: [...Array(5)].map((_) => faker.datatype.float({ min: 0, max: 10, precision: 0.25 })),
+            m45: [...Array(3)].map((_) => faker.datatype.float({ min: 0, max: 10, precision: 0.25 })),
             final: faker.datatype.float({ min: 0, max: 10, precision: 0.25 }),
           },
         });
