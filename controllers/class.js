@@ -37,7 +37,7 @@ exports.createClass = async (req, res, next) => {
 
     res.status(201).json({ message: "Thêm lớp thành công" });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }

@@ -35,3 +35,5 @@
 ::1 - - [01/Nov/2022:02:11:35 +0000] "GET /data HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
 ::1 - - [01/Nov/2022:02:11:55 +0000] "GET /data HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
 ::1 - - [01/Nov/2022:02:14:26 +0000] "GET /data HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
+::1 - - [01/Nov/2022:10:05:21 +0000] "POST /classes HTTP/1.1" 500 77 "-" "PostmanRuntime/7.29.2"
+::1 - - [01/Nov/2022:10:07:17 +0000] "POST /classes HTTP/1.1" 201 38 "-" "PostmanRuntime/7.29.2"
