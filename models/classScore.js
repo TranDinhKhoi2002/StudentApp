@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const classScoreSchema = new Schema({
+  class: {
+    type: Schema.Types.ObjectId,
+    ref: "Class",
+    required: true,
+  },
   subject: {
     type: Schema.Types.ObjectId,
     ref: "Subject",
@@ -18,11 +23,9 @@ const classScoreSchema = new Schema({
   },
   studentScores: [
     {
-      scores: {
-        type: Schema.Types.ObjectId,
-        ref: "StudentScore",
-        required: true,
-      },
+      type: Schema.Types.ObjectId,
+      ref: "StudentScore",
+      required: true,
     },
   ],
 });

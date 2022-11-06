@@ -1,8 +1,8 @@
+const { validationResult } = require("express-validator");
 const Class = require("../models/class");
+const Teacher = require("../models/teacher");
 
-const {
-  checkStaffAndPrincipalRole,
-} = require("../util/checkStaffAndPrincipalRole");
+const { checkStaffAndPrincipalRole } = require("../util/roles");
 
 exports.createClass = async (req, res, next) => {
   const errors = validationResult(req);
@@ -17,9 +17,7 @@ exports.createClass = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm lớp");
       error.statusCode = 401;
       return next(error);
     }
@@ -29,8 +27,13 @@ exports.createClass = async (req, res, next) => {
       teacher,
       name,
       schoolYear,
+      students: [],
     });
     await _class.save();
+
+    const currentTeacher = await Teacher.findById(teacher);
+    currentTeacher.classes.push(_class._id);
+    await currentTeacher.save();
 
     res.status(201).json({ message: "Thêm lớp thành công" });
   } catch (err) {
@@ -54,9 +57,7 @@ exports.updateClass = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -104,9 +105,7 @@ exports.deleteClass = async (req, res, next) => {
 exports.getClassById = async (req, res, next) => {
   const classId = req.params.classId;
   try {
-    const _class = await Class.findById(classId)
-      .populate("grade")
-      .populate("teacher");
+    const _class = await Class.findById(classId).populate("grade").populate("teacher");
     if (!_class) {
       const error = new Error("Lớp không tồn tại");
       error.statusCode = 404;
@@ -148,9 +147,7 @@ exports.getClassesByGrade = async (req, res, next) => {
       return next(error);
     }
 
-    const classesByGrade = classes.filter(
-      (_class) => _class.grade.name === grade
-    );
+    const classesByGrade = classes.filter((_class) => _class.grade.name === grade);
     res.status(200).json({ classesByGrade });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
@@ -162,9 +159,7 @@ exports.getClassesByGrade = async (req, res, next) => {
 exports.getClassesByName = async (req, res, next) => {
   const className = req.params.className;
   try {
-    const classesByName = await Class.find({ name: className })
-      .populate("grade")
-      .populate("teacher");
+    const classesByName = await Class.find({ name: className }).populate("grade").populate("teacher");
     if (!classesByName) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
       error.statusCode = 404;
@@ -182,9 +177,7 @@ exports.getClassesByName = async (req, res, next) => {
 exports.getClassesBySchoolYear = async (req, res, next) => {
   const schoolYear = +req.params.schoolYear;
   try {
-    const classesBySchoolYear = await Class.find({ schoolYear })
-      .populate("grade")
-      .populate("teacher");
+    const classesBySchoolYear = await Class.find({ schoolYear }).populate("grade").populate("teacher");
     if (!classesBySchoolYear) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
       error.statusCode = 404;

@@ -5,8 +5,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
-const multer = require("multer");
-const { v4: uuidv4 } = require("uuid");
 
 const helmet = require("helmet");
 const compression = require("compression");
@@ -18,10 +16,7 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE"
-  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
@@ -31,29 +26,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// const fileStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "images");
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, uuidv4() + "-" + file.originalname);
-//   },
-// });
-
-// const fileFilter = (req, file, cb) => {
-//   if (
-//     file.mimetype === "image/png" ||
-//     file.mimetype === "image/jpg" ||
-//     file.mimetype === "image/jpeg"
-//   ) {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
-
-// app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
-
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
 const classRoutes = require("./routes/class");
@@ -61,11 +33,9 @@ const scoreRoutes = require("./routes/score");
 const subjectRoutes = require("./routes/subject");
 const teacherRoutes = require("./routes/teacher");
 const staffRoutes = require("./routes/staff");
+const dataRoutes = require("./routes/data");
 
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access.log"),
-  { flags: "a" }
-);
+const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
 // const privateKey = fs.readFileSync("server.key");
 // const certificate = fs.readFileSync("server.cert");
 
@@ -80,11 +50,16 @@ app.use(scoreRoutes);
 app.use(subjectRoutes);
 app.use(teacherRoutes);
 app.use(staffRoutes);
+app.use(dataRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;
   res.status(statusCode).json({ message, data, validationErrors });
 });
+
+// const { generateFakeData, removeAllData } = require("./util/fakeData");
+// removeAllData();
+// generateFakeData();
 
 mongoose
   .connect(

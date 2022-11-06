@@ -10,6 +10,8 @@ const Account = require("../models/account");
 const Subject = require("../models/subject");
 const TeacherRole = require("../models/role");
 const Teacher = require("../models/teacher");
+const Staff = require("../models/staff");
+const { getRole } = require("../util/roles");
 
 exports.login = async (req, res, next) => {
   const { username, password } = req.body;
@@ -38,7 +40,9 @@ exports.login = async (req, res, next) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ token, accountId: account._id.toString() });
+    const role = await getRole(account._id.toString());
+
+    res.status(200).json({ token, accountId: account._id.toString(), role });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -128,12 +132,13 @@ exports.resetPassword = async (req, res, next) => {
     const token = buffer.toString("hex");
     try {
       const teacher = await Teacher.findOne({ email: req.body.email });
-      if (!teacher) {
+      const staff = await Staff.findOne({ email: req.body.email });
+      if (!teacher && !staff) {
         return res.status(404).json({ message: "Email không tồn tại" });
       }
 
       const account = await Account.findOne({
-        _id: teacher.account.toString(),
+        _id: teacher.account.toString() || staff.account.toString(),
       });
       if (!account) {
         return res.status(404).json({ message: "Tài khoản không tồn tại" });
@@ -152,9 +157,10 @@ exports.resetPassword = async (req, res, next) => {
         },
       });
 
-      res
-        .status(200)
-        .json({ message: "Gửi yêu cầu khôi phục mật khẩu thành công" });
+      res.status(200).json({
+        message: "Gửi yêu cầu khôi phục mật khẩu thành công",
+        accountId: account._id,
+      });
     } catch (err) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
       error.statusCode = 500;

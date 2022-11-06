@@ -27,11 +27,9 @@ const classSchema = new Schema({
   },
   students: [
     {
-      studentId: {
-        type: Schema.Types.ObjectId,
-        ref: "Student",
-        required: true,
-      },
+      type: Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
     },
   ],
 });
