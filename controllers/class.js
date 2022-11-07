@@ -177,7 +177,10 @@ exports.getClassesByName = async (req, res, next) => {
 exports.getClassesBySchoolYear = async (req, res, next) => {
   const schoolYear = +req.params.schoolYear;
   try {
-    const classesBySchoolYear = await Class.find({ schoolYear }).populate("grade").populate("teacher");
+    const classesBySchoolYear = await Class.find({ schoolYear })
+      .populate("grade")
+      .populate("teacher")
+      .populate("students");
     if (!classesBySchoolYear) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
       error.statusCode = 404;

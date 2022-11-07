@@ -39,31 +39,13 @@ router.get("/classes/id/:classId", isAuth, classController.getClassById);
 
 router.get("/classes/grade/:grade", isAuth, classController.getClassesByGrade);
 
-router.get(
-  "/classes/name/:className",
-  isAuth,
-  classController.getClassesByName
-);
+router.get("/classes/name/:className", isAuth, classController.getClassesByName);
 
-router.get(
-  "/classes/schoolYear/:schoolYear",
-  isAuth,
-  classController.getClassesBySchoolYear
-);
+router.get("/classes/schoolYear/:schoolYear", isAuth, classController.getClassesBySchoolYear);
 
-router.post(
-  "/classes",
-  isAuth,
-  classAuthentication,
-  classController.createClass
-);
+router.post("/classes", isAuth, classAuthentication, classController.createClass);
 
-router.put(
-  "/classes/:classId",
-  isAuth,
-  classAuthentication,
-  classController.updateClass
-);
+router.put("/classes/:classId", isAuth, classAuthentication, classController.updateClass);
 
 router.delete("/classes/:classId", isAuth, classController.deleteClass);
 
