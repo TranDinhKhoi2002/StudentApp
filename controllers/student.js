@@ -20,9 +20,7 @@ exports.createStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -71,9 +69,7 @@ exports.updateStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -109,9 +105,7 @@ exports.deleteStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
       error.statusCode = 401;
       return next(error);
     }
