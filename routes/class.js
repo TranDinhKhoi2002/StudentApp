@@ -35,6 +35,8 @@ const classAuthentication = [
 
 router.get("/classes", isAuth, classController.getClasses);
 
+router.get("/classesByNameAndSchoolYear", isAuth, classController.getClassesByNameAndSchoolYear);
+
 router.get("/classes/id/:classId", isAuth, classController.getClassById);
 
 router.get("/classes/grade/:grade", isAuth, classController.getClassesByGrade);

@@ -197,3 +197,69 @@ exports.getClassesBySchoolYear = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getClassesByNameAndSchoolYear = async (req, res, next) => {
+  const { className, schoolYear } = req.query;
+  try {
+    if (
+      className &&
+      className !== "undefined" &&
+      className !== "Mọi lớp" &&
+      schoolYear &&
+      schoolYear !== "undefined" &&
+      schoolYear !== "Mọi năm học"
+    ) {
+      const classes = await Class.find({ name: className, schoolYear: +schoolYear })
+        .populate("grade")
+        .populate("teacher")
+        .populate("students");
+      if (!classes) {
+        const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+        error.statusCode = 404;
+        return next(error);
+      }
+
+      return res.status(200).json({ classes });
+    }
+
+    if (
+      (className === "undefined" && schoolYear === "undefined") ||
+      (className === "Mọi lớp" && schoolYear === "Mọi năm học")
+    ) {
+      const classes = await Class.find().populate("grade").populate("teacher").populate("students");
+      if (!classes) {
+        const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+        error.statusCode = 404;
+        return next(error);
+      }
+
+      return res.status(200).json({ classes });
+    }
+
+    if (!className || className === "Mọi lớp") {
+      const classes = await Class.find({ schoolYear }).populate("grade").populate("teacher").populate("students");
+      if (!classes) {
+        const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+        error.statusCode = 404;
+        return next(error);
+      }
+
+      return res.status(200).json({ classes });
+    }
+
+    if (!schoolYear || schoolYear === "Mọi năm học") {
+      const classes = await Class.find({ name: className }).populate("grade").populate("teacher").populate("students");
+      if (!classes) {
+        const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+        error.statusCode = 404;
+        return next(error);
+      }
+
+      return res.status(200).json({ classes });
+    }
+  } catch (err) {
+    const error = new Error(err.message);
+    error.statusCode = 500;
+    next(error);
+  }
+};
