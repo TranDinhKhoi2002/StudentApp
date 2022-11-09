@@ -2,13 +2,9 @@ const ClassScore = require("../models/classScore");
 const StudentScore = require("../models/studentScore");
 
 exports.getScores = async (req, res, next) => {
-  const { classId, subjectId, semesterId, schoolYear } = req.query;
   try {
-    const classScore = await ClassScore.findOne({
-      class: classId,
-      subject: subjectId,
-      semester: semesterId,
-      schoolYear: +schoolYear,
+    const classScore = await ClassScore.find({
+      ...req.query,
     }).populate("studentScores");
 
     if (!classScore) {
