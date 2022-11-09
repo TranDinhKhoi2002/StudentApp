@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const Staff = require("../models/staff");
 const Account = require("../models/account");
 
-const { checkPrincipalRole } = require("../util/checkStaffAndPricipalRole");
+const { checkPrincipalRole } = require("../util/roles");
 
 exports.getStaffs = async (req, res, next) => {
   try {
@@ -105,7 +105,7 @@ exports.updateStaff = async (req, res, next) => {
 
   try {
     const isAuthorized = await checkPrincipalRole(req.accountId);
-    if (!isAuthorized) {
+    if (!isAuthorized && staffId != req.accountId) {
       const error = new Error(
         "Chỉ có hiệu trưởng mới được cập nhật thông tin nhân viên giáo vụ"
       );

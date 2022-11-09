@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const Subject = require("../models/subject");
 const Teacher = require("../models/teacher");
-const { checkPrincipalRole } = require("../util/checkStaffAndPrincipalRole");
+const { checkPrincipalRole } = require("../util/roles");
 
 exports.getSubjects = async (req, res, next) => {
   try {

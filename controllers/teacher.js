@@ -5,7 +5,7 @@ const Subject = require("../models/subject");
 const Account = require("../models/account");
 const Class = require("../models/class");
 
-const { checkPrincipalRole } = require("../util/checkStaffAndPricipalRole");
+const { checkPrincipalRole } = require("../util/roles");
 
 exports.getTeachers = async (req, res, next) => {
   try {
@@ -113,7 +113,7 @@ exports.updateTeacher = async (req, res, next) => {
 
   try {
     const isAuthorized = await checkPrincipalRole(req.accountId);
-    if (!isAuthorized) {
+    if (!isAuthorized && teacherId != req.teacherId) {
       const error = new Error(
         "Chỉ có hiệu trưởng mới được cập nhật thông tin giáo viên"
       );

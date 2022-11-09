@@ -82,7 +82,7 @@ router.post(
   teacherController.createTeacher
 );
 
-router.post(
+router.put(
   "/teachers/:teacherId",
   isAuth,
   teacherAuthentication,
