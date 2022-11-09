@@ -1,22 +1,19 @@
-const Score = require("../models/studentScore");
+const ClassScore = require("../models/classScore");
+const StudentScore = require("../models/studentScore");
 
 exports.getScores = async (req, res, next) => {
-  const { studentId, subjectId, semesterId, schoolYear } = req.query;
   try {
-    const transcriptSubject = await Score.findOne({
-      student: studentId,
-      subject: subjectId,
-      semester: semesterId,
-      schoolYear: schoolYear,
-    });
+    const classScore = await ClassScore.find({
+      ...req.query,
+    }).populate("studentScores");
 
-    if (!transcriptSubject) {
+    if (!classScore) {
       const error = new Error("Không tìm thấy bảng điểm nào");
       error.statusCode = 404;
       return next(error);
     }
 
-    res.status(200).json({ transcriptSubject });
+    res.status(200).json({ classScore });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;
@@ -25,11 +22,10 @@ exports.getScores = async (req, res, next) => {
 };
 
 exports.updateScore = async (req, res, next) => {
-  const { score, index, column, studentId, subjectId, semesterId, schoolYear } =
-    req.body;
+  const { score, index, column, studentId, subjectId, semesterId, schoolYear } = req.body;
 
   try {
-    const transcriptSubject = await Score.findOne({
+    const transcriptSubject = await StudentScore.findOne({
       student: studentId,
       subject: subjectId,
       semester: semesterId,

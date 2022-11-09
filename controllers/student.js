@@ -20,9 +20,7 @@ exports.createStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -66,14 +64,12 @@ exports.updateStudent = async (req, res, next) => {
   }
 
   const studentId = req.params.studentId;
-  const { className, name, gender, birthday, address, email, phone } = req.body;
+  const { className, name, gender, birthday, address, email, phone, status } = req.body;
 
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -92,12 +88,12 @@ exports.updateStudent = async (req, res, next) => {
     student.address = address;
     student.email = email;
     student.phone = phone;
-    student.avatar = avatarUrl;
+    student.status = status;
     await student.save();
 
     res.status(201).json({ message: "Cập nhật học sinh thành công" });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }
@@ -109,9 +105,7 @@ exports.deleteStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
       error.statusCode = 401;
       return next(error);
     }

@@ -17,13 +17,8 @@ router.post(
   [
     body("className").isMongoId().withMessage("Lớp không hợp lệ"),
     body("name", "Tên không được để trống").notEmpty().trim(),
-    body("gender", "Giới tính không hợp lệ").custom((value, { req }) => {
-      if (value !== "Nam" || value !== "Nữ") {
-        return false;
-      }
-      return true;
-    }),
-    body("birthday", "Ngày sinh không hợp lệ").isDate(),
+    body("gender", "Giới tính không hợp lệ").isIn(["Nam", "Nữ"]),
+    body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
     body("address", "Địa chỉ không được để trống").notEmpty().trim(),
     body("email")
       .isEmail()
@@ -47,25 +42,10 @@ router.put(
   [
     body("className").isMongoId().withMessage("Lớp không hợp lệ"),
     body("name", "Tên không được để trống").notEmpty().trim(),
-    body("gender", "Giới tính không hợp lệ").custom((value, { req }) => {
-      if (value !== "Nam" || value !== "Nữ") {
-        return false;
-      }
-      return true;
-    }),
-    body("birthday", "Ngày sinh không hợp lệ").isDate(),
+    body("gender", "Giới tính không hợp lệ").isIn(["Nam", "Nữ"]),
+    body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
     body("address", "Địa chỉ không được để trống").notEmpty().trim(),
-    body("email")
-      .isEmail()
-      .withMessage("Email không hợp lệ")
-      .custom((value, { req }) => {
-        return Student.findOne({ email: value }).then((studentDoc) => {
-          if (studentDoc) {
-            return Promise.reject("Email đã tồn tại, vui lòng chọn email khác");
-          }
-        });
-      })
-      .normalizeEmail(),
+    body("email").isEmail().withMessage("Email không hợp lệ").normalizeEmail(),
     body("phone", "Số điện thoại không hợp lệ").isMobilePhone("vi-VN"),
   ],
   studentController.updateStudent

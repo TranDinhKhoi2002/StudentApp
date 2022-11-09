@@ -46,14 +46,8 @@ const studentScoreSchema = new Schema({
       max: 10,
       default: function () {
         return (
-          (sum(this.scores.oral) +
-            sum(this.scores.m15) +
-            sum(this.scores.m45) * 2 +
-            this.scores.final * 3) /
-          (this.scores.oral.length +
-            this.scores.m15.length +
-            2 * this.scores.m45.length +
-            3)
+          (sum(this.scores.oral) + sum(this.scores.m15) + sum(this.scores.m45) * 2 + this.scores.final * 3) /
+          (this.scores.oral.length + this.scores.m15.length + 2 * this.scores.m45.length + 3)
         ).toFixed(2);
       },
     },

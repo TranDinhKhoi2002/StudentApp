@@ -23,7 +23,7 @@ const classSchema = new Schema({
   semester: {
     type: Schema.Types.ObjectId,
     ref: "Semester",
-    required: true,
+    default: "eaacbcf53926b0ab9413ce2a",
   },
   students: [
     {
