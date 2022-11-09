@@ -64,7 +64,7 @@ exports.updateStudent = async (req, res, next) => {
   }
 
   const studentId = req.params.studentId;
-  const { className, name, gender, birthday, address, email, phone } = req.body;
+  const { className, name, gender, birthday, address, email, phone, status } = req.body;
 
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -88,12 +88,12 @@ exports.updateStudent = async (req, res, next) => {
     student.address = address;
     student.email = email;
     student.phone = phone;
-    student.avatar = avatarUrl;
+    student.status = status;
     await student.save();
 
     res.status(201).json({ message: "Cập nhật học sinh thành công" });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }

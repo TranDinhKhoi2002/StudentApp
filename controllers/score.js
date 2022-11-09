@@ -9,7 +9,7 @@ exports.getScores = async (req, res, next) => {
       subject: subjectId,
       semester: semesterId,
       schoolYear: +schoolYear,
-    });
+    }).populate("studentScores");
 
     if (!classScore) {
       const error = new Error("Không tìm thấy bảng điểm nào");
