@@ -31,20 +31,6 @@ exports.createStudent = async (req, res, next) => {
       return next(error);
     }
 
-    let existingStudent = await Student.findOne({ email });
-    if (existingStudent) {
-      const error = new Error("Email đã được sử dụng");
-      error.statusCode = 422;
-      return next(error);
-    }
-
-    existingStudent = await Student.findOne({ phone });
-    if (existingStudent) {
-      const error = new Error("Số điện thoại đã được sử dụng");
-      error.statusCode = 422;
-      return next(error);
-    }
-
     const student = new Student({
       className,
       name,
