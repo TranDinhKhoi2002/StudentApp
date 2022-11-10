@@ -195,3 +195,6 @@
 ::1 - - [09/Nov/2022:16:37:45 +0000] "GET /scores?semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
 ::1 - - [09/Nov/2022:16:37:52 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
 ::1 - - [09/Nov/2022:16:39:23 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
+::1 - - [10/Nov/2022:02:36:11 +0000] "DELETE /students/dc9091400802dfcfa55c432d HTTP/1.1" 200 42 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+::1 - - [10/Nov/2022:02:37:40 +0000] "DELETE /students/636c5f7cea523d6f02021258 HTTP/1.1" 200 42 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+::1 - - [10/Nov/2022:02:38:57 +0000] "DELETE /students/636c6430ea523d6f0202128f HTTP/1.1" 200 42 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
