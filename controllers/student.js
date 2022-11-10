@@ -2,7 +2,6 @@ const { validationResult } = require("express-validator");
 
 const Student = require("../models/student");
 const Class = require("../models/class");
-const fileHelper = require("../util/file");
 
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 
@@ -132,7 +131,24 @@ exports.deleteStudent = async (req, res, next) => {
   }
 };
 
-exports.getStudents = async (req, res, next) => {
+exports.getAllStudents = async (req, res, next) => {
+  try {
+    const students = await Student.find().populate("className");
+    if (!students) {
+      const error = new Error("Không tìm thấy học sinh nào");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ students });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.getStudentsByClassId = async (req, res, next) => {
   const { classId } = req.params;
 
   try {

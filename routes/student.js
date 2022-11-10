@@ -7,7 +7,9 @@ const isAuth = require("../middleware/is-auth");
 
 const Student = require("../models/student");
 
-router.get("/students/:classId", isAuth, studentController.getStudents);
+router.get("/students", isAuth, studentController.getAllStudents);
+
+router.get("/students/:classId", isAuth, studentController.getStudentsByClassId);
 
 router.get("/students/:studentId", isAuth, studentController.getStudent);
 
