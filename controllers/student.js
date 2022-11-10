@@ -105,7 +105,7 @@ exports.deleteStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được xóa học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -116,10 +116,6 @@ exports.deleteStudent = async (req, res, next) => {
       const error = new Error("Học sinh không tồn tại");
       error.statusCode = 404;
       return next(error);
-    }
-
-    if (student.avatar.startsWith("/images")) {
-      fileHelper.deleteFile(student.avatar);
     }
 
     await Student.findByIdAndRemove(studentId);
