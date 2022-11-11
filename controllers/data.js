@@ -2,11 +2,13 @@ const Staff = require("../models/staff");
 const Subject = require("../models/subject");
 const Teacher = require("../models/teacher");
 const Class = require("../models/class");
+const Semester = require("../models/semester");
 
 exports.getData = async (req, res, next) => {
   const accountId = req.accountId;
 
   const subjects = await Subject.find();
+  const semesters = await Semester.find();
 
   let classes = await Class.find().populate({
     path: "students",
@@ -29,6 +31,7 @@ exports.getData = async (req, res, next) => {
   res.status(200).json({
     classes,
     subjects,
+    semesters,
     role,
   });
 };
