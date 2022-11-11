@@ -228,3 +228,8 @@
 ::1 - - [10/Nov/2022:08:15:51 +0000] "GET /classesByNameAndSchoolYear?name=10A6&schoolYear=2022 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
 ::1 - - [10/Nov/2022:08:15:58 +0000] "GET /classesByNameAndSchoolYear?name=10A6&schoolYear=2022 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
 ::1 - - [10/Nov/2022:08:16:01 +0000] "GET /classesByNameAndSchoolYear?name=10A6&schoolYear=2022 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+::1 - - [11/Nov/2022:04:35:50 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 500 25 "-" "PostmanRuntime/7.29.2"
+::1 - - [11/Nov/2022:04:37:13 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
+::1 - - [11/Nov/2022:04:40:42 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
+::1 - - [11/Nov/2022:04:41:05 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"
+::1 - - [11/Nov/2022:04:41:07 +0000] "GET /scores?subject=6360ebcb2e95fb516b209af9&semester=eaacbcf53926b0ab9413ce2a HTTP/1.1" 200 - "-" "PostmanRuntime/7.29.2"

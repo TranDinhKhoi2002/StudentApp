@@ -5,7 +5,10 @@ exports.getScores = async (req, res, next) => {
   try {
     const classScore = await ClassScore.find({
       ...req.query,
-    }).populate("studentScores");
+    }).populate({
+      path: "studentScores",
+      populate: { path: "student" },
+    });
 
     if (!classScore) {
       const error = new Error("Không tìm thấy bảng điểm nào");
