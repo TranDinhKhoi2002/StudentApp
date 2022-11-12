@@ -12,9 +12,7 @@ exports.getData = async (req, res, next) => {
   const semesters = await Semester.find();
   const grades = await Grade.find();
 
-  let classes = await Class.find().populate({
-    path: "students",
-  });
+  let classes = await Class.find().populate("grade").populate("teacher").populate("semester").populate("students");
   let role;
   const teacher = await Teacher.findOne({ account: accountId })
     .populate({
