@@ -253,3 +253,4 @@
 ::1 - - [12/Nov/2022:09:15:27 +0000] "GET /classes?& HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
 ::1 - - [12/Nov/2022:09:15:32 +0000] "GET /classes?&schoolYear=2018 HTTP/1.1" 200 14 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
 ::1 - - [12/Nov/2022:09:18:43 +0000] "GET /classes?& HTTP/1.1" 200 852 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+::1 - - [12/Nov/2022:09:22:08 +0000] "GET /classes?& HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
