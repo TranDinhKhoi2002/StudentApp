@@ -102,112 +102,12 @@ exports.deleteClass = async (req, res, next) => {
   }
 };
 
-exports.getClassById = async (req, res, next) => {
-  const classId = req.params.classId;
-  try {
-    const _class = await Class.findById(classId).populate("grade").populate("teacher");
-    if (!_class) {
-      const error = new Error("Lớp không tồn tại");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.status(200).json({ class: _class });
-  } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-    error.statusCode = 500;
-    next(error);
-  }
-};
-
 exports.getClasses = async (req, res, next) => {
-  try {
-    const classes = await Class.find().populate("grade").populate("teacher");
-    if (!classes) {
-      const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.status(200).json({ classes });
-  } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-    error.statusCode = 500;
-    next(error);
-  }
-};
-
-exports.getClassesByGrade = async (req, res, next) => {
-  const grade = +req.params.grade;
-  try {
-    const classes = await Class.find().populate("grade").populate("teacher");
-    if (!classes) {
-      const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    const classesByGrade = classes.filter((_class) => _class.grade.name === grade);
-    res.status(200).json({ classesByGrade });
-  } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-    error.statusCode = 500;
-    next(error);
-  }
-};
-
-exports.getClassesByGradeAndSchoolYear = async (req, res, next) => {
-  try {
-  } catch (err) {}
-};
-
-exports.getClassesByName = async (req, res, next) => {
-  const className = req.params.className;
-  try {
-    const classesByName = await Class.find({ name: className })
-      .populate("grade")
-      .populate("teacher")
-      .populate("students");
-    if (!classesByName) {
-      const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.status(200).json({ classesByName });
-  } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-    error.statusCode = 500;
-    next(error);
-  }
-};
-
-exports.getClassesBySchoolYear = async (req, res, next) => {
-  const schoolYear = +req.params.schoolYear;
-  try {
-    const classesBySchoolYear = await Class.find({ schoolYear })
-      .populate("grade")
-      .populate("teacher")
-      .populate("students");
-    if (!classesBySchoolYear) {
-      const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.status(200).json({ classesBySchoolYear });
-  } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-    error.statusCode = 500;
-    next(error);
-  }
-};
-
-exports.getClassesByNameAndSchoolYear = async (req, res, next) => {
   try {
     const classes = await Class.find({ ...req.query })
       .populate("grade")
       .populate("teacher")
+      .populate("semester")
       .populate("students");
     if (!classes) {
       const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
@@ -216,9 +116,5 @@ exports.getClassesByNameAndSchoolYear = async (req, res, next) => {
     }
 
     res.status(200).json({ classes });
-  } catch (err) {
-    const error = new Error(err.message);
-    error.statusCode = 500;
-    next(error);
-  }
+  } catch (err) {}
 };
