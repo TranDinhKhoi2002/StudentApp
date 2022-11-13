@@ -2,7 +2,6 @@ const { validationResult } = require("express-validator");
 
 const Student = require("../models/student");
 const Class = require("../models/class");
-const fileHelper = require("../util/file");
 
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 
@@ -105,7 +104,7 @@ exports.deleteStudent = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được xóa học sinh");
       error.statusCode = 401;
       return next(error);
     }
@@ -116,10 +115,6 @@ exports.deleteStudent = async (req, res, next) => {
       const error = new Error("Học sinh không tồn tại");
       error.statusCode = 404;
       return next(error);
-    }
-
-    if (student.avatar.startsWith("/images")) {
-      fileHelper.deleteFile(student.avatar);
     }
 
     await Student.findByIdAndRemove(studentId);
@@ -136,7 +131,24 @@ exports.deleteStudent = async (req, res, next) => {
   }
 };
 
-exports.getStudents = async (req, res, next) => {
+exports.getAllStudents = async (req, res, next) => {
+  try {
+    const students = await Student.find().populate("className");
+    if (!students) {
+      const error = new Error("Không tìm thấy học sinh nào");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ students });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.getStudentsByClassId = async (req, res, next) => {
   const { classId } = req.params;
 
   try {

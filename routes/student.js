@@ -7,7 +7,9 @@ const isAuth = require("../middleware/is-auth");
 
 const Student = require("../models/student");
 
-router.get("/students/:classId", isAuth, studentController.getStudents);
+router.get("/students", isAuth, studentController.getAllStudents);
+
+router.get("/students/:classId", isAuth, studentController.getStudentsByClassId);
 
 router.get("/students/:studentId", isAuth, studentController.getStudent);
 
@@ -26,12 +28,20 @@ router.post(
       .custom((value, { req }) => {
         return Student.findOne({ email: value }).then((studentDoc) => {
           if (studentDoc) {
-            return Promise.reject("Email đã tồn tại, vui lòng chọn email khác");
+            return Promise.reject("Email đã được sử dụng");
           }
         });
       })
       .normalizeEmail(),
-    body("phone", "Số điện thoại không hợp lệ").isMobilePhone("vi-VN"),
+    body("phone", "Số điện thoại không hợp lệ")
+      .isMobilePhone("vi-VN")
+      .custom((value, { req }) => {
+        return Student.findOne({ phone: value }).then((studentDoc) => {
+          if (studentDoc) {
+            return Promise.reject("Số điện thoại đã được sử dụng");
+          }
+        });
+      }),
   ],
   studentController.createStudent
 );
