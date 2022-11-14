@@ -116,5 +116,9 @@ exports.getClasses = async (req, res, next) => {
     }
 
     res.status(200).json({ classes });
-  } catch (err) {}
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
 };
