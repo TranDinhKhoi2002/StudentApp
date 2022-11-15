@@ -80,6 +80,24 @@ exports.updateStudent = async (req, res, next) => {
       return next(error);
     }
 
+    if (email !== student.email) {
+      const existingStudent = await Student.find({ email });
+      if (existingStudent) {
+        const error = new Error("Email đã được sử dụng");
+        error.statusCode = 422;
+        return next(error);
+      }
+    }
+
+    if (phone !== student.phone) {
+      const existingStudent = await Student.find({ phone });
+      if (existingStudent) {
+        const error = new Error("Số điện thoại đã được sử dụng");
+        error.statusCode = 422;
+        return next(error);
+      }
+    }
+
     student.className = className;
     student.name = name;
     student.gender = gender;
