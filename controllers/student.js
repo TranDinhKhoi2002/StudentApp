@@ -98,6 +98,16 @@ exports.updateStudent = async (req, res, next) => {
       }
     }
 
+    if (className !== student.className) {
+      const existingClass = await Class.findById(student.className);
+      existingClass.students.pull(studentId);
+      await existingClass.save();
+
+      const newClass = await Class.findById(className);
+      newClass.students.push(studentId);
+      await newClass.save();
+    }
+
     student.className = className;
     student.name = name;
     student.gender = gender;
