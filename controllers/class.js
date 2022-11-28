@@ -68,9 +68,11 @@ exports.updateClass = async (req, res, next) => {
     if (updatedClass.teacher.toString() !== teacher) {
       const oldTeacher = await Teacher.findById(updatedClass.teacher);
       oldTeacher.classes.pull(classId);
+      await oldTeacher.save();
 
       const newTeacher = await Teacher.findById(teacher);
       newTeacher.classes.push(classId);
+      await newTeacher.save();
       updatedClass.teacher = teacher;
     }
     await updatedClass.save();
