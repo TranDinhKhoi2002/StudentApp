@@ -30,7 +30,6 @@ const classValidation = [
       });
     }),
   body("name").not().isEmpty().withMessage("Tên lớp không được rỗng"),
-  body("schoolYear").isNumeric().withMessage("Năm học phải là số"),
 ];
 
 router.get("/classes", isAuth, classController.getClasses);
