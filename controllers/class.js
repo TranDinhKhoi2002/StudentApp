@@ -64,8 +64,15 @@ exports.updateClass = async (req, res, next) => {
 
     const updatedClass = await Class.findById(classId);
     updatedClass.grade = grade;
-    updatedClass.teacher = teacher;
     updatedClass.name = name;
+    if (updatedClass.teacher.toString() !== teacher) {
+      const oldTeacher = await Teacher.findById(updatedClass.teacher);
+      oldTeacher.classes.pull(classId);
+
+      const newTeacher = await Teacher.findById(teacher);
+      newTeacher.classes.push(classId);
+      updatedClass.teacher = teacher;
+    }
     await updatedClass.save();
 
     res.status(201).json({ message: "Cập nhật lớp thành công" });
