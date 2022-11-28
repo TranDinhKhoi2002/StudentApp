@@ -52,7 +52,7 @@ exports.updateClass = async (req, res, next) => {
     return next(error);
   }
 
-  const { grade, teacher, name, schoolYear } = req.body;
+  const { grade, teacher, name } = req.body;
   const classId = req.params.classId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -66,7 +66,6 @@ exports.updateClass = async (req, res, next) => {
     updatedClass.grade = grade;
     updatedClass.teacher = teacher;
     updatedClass.name = name;
-    updatedClass.schoolYear = schoolYear;
     await updatedClass.save();
 
     res.status(201).json({ message: "Cập nhật lớp thành công" });
