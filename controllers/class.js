@@ -101,6 +101,10 @@ exports.deleteClass = async (req, res, next) => {
       return next(error);
     }
 
+    const currentTeacher = await Teacher.findById(_class.teacher);
+    currentTeacher.classes.pull(classId);
+    await currentTeacher.save();
+
     await Class.findByIdAndRemove(classId);
     res.status(200).json({ message: "Xoá lớp thành công" });
   } catch (err) {
