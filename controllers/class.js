@@ -35,7 +35,7 @@ exports.createClass = async (req, res, next) => {
     currentTeacher.classes.push(_class._id);
     await currentTeacher.save();
 
-    res.status(201).json({ message: "Thêm lớp thành công" });
+    res.status(201).json({ message: "Thêm lớp thành công", newClass: _class });
   } catch (err) {
     const error = new Error(err.message);
     error.statusCode = 500;
