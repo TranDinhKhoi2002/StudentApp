@@ -2,34 +2,40 @@ const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
 
-const Subject = require("../models/subject");
-const Role = require("../models/role");
+const Teacher = require("../models/teacher");
 const isAuth = require("../middleware/is-auth");
 const teacherController = require("../controllers/teacher");
 
 const teacherValidation = [
-  body("subject")
-    .isMongoId()
-    .withMessage("Môn học không hợp lệ")
+  body("name", "Tên không được để trống").trim().notEmpty(),
+  body("address", "Địa chỉ không được để trống").trim().notEmpty(),
+  body("email")
+    .isEmail()
+    .withMessage("Email không hợp lệ")
     .custom((value, { req }) => {
-      return Subject.findById(value).then((subjectDoc) => {
-        if (!subjectDoc) {
-          return Promise.reject("Môn học không tồn tại");
+      return Teacher.findOne({ email: value }).then((teacherDoc) => {
+        if (teacherDoc) {
+          return Promise.reject("Email đã được sử dụng");
+        }
+      });
+    })
+    .normalizeEmail(),
+  body("phone", "Số điện thoại không hợp lệ")
+    .isMobilePhone("vi-VN")
+    .custom((value, { req }) => {
+      return Teacher.findOne({ phone: value }).then((teacherDoc) => {
+        if (teacherDoc) {
+          return Promise.reject("Số điện thoại đã được sử dụng");
         }
       });
     }),
-  body("role")
-    .isMongoId()
-    .withMessage("Vai trò không hợp lệ")
-    .custom((value, { req }) => {
-      return Role.findById(value).then((roleDoc) => {
-        if (!roleDoc) {
-          return Promise.reject("Vai trò không tồn tại");
-        }
-      });
-    }),
+  body("gender", "Giới tính không hợp lệ").isIn(["Nam", "Nữ"]),
+  body("status", "Trạng thái không hợp lệ").isIn(["Đang dạy", "Đã nghỉ"]),
+  body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
 ];
 
 router.get("/teachers", isAuth, teacherController.getTeachers);
+
+router.put("/teachers/:teacherId", isAuth, teacherValidation, teacherController.updateTeacher);
 
 module.exports = router;
