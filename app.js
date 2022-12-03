@@ -28,7 +28,13 @@ app.use((req, res, next) => {
 
 const cors = require("cors");
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    optionSuccessStatus: 200,
+  })
+);
 
 const authRoutes = require("./routes/auth");
 const studentRoutes = require("./routes/student");
