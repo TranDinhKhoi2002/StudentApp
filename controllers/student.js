@@ -80,7 +80,7 @@ exports.updateStudent = async (req, res, next) => {
       return next(error);
     }
 
-    if (email !== student.email) {
+    if (email.toLowerCase() !== student.email.toLowerCase()) {
       const existingStudent = await Student.find({ email });
       if (existingStudent) {
         const error = new Error("Email đã được sử dụng");

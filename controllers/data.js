@@ -4,6 +4,7 @@ const Teacher = require("../models/teacher");
 const Class = require("../models/class");
 const Semester = require("../models/semester");
 const Grade = require("../models/grade");
+const Role = require("../models/role");
 
 exports.getData = async (req, res, next) => {
   const accountId = req.accountId;
@@ -11,6 +12,7 @@ exports.getData = async (req, res, next) => {
   const subjects = await Subject.find();
   const semesters = await Semester.find();
   const grades = await Grade.find();
+  const roles = await Role.find();
 
   let classes = await Class.find().populate("grade").populate("teacher").populate("semester").populate("students");
   let role;
@@ -33,6 +35,7 @@ exports.getData = async (req, res, next) => {
     subjects,
     semesters,
     role,
+    roles,
     grades,
   });
 };

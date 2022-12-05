@@ -45,7 +45,7 @@ const teacherSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["Đang dạy, Đã nghỉ"],
+    // enum: ["Đang dạy, Đã nghỉ"],
     default: "Đang dạy",
   },
 });
