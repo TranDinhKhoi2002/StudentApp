@@ -16,6 +16,7 @@ exports.getData = async (req, res, next) => {
 
   let classes = await Class.find().populate("grade").populate("teacher").populate("semester").populate("students");
   let role;
+  let user;
   const teacher = await Teacher.findOne({ account: accountId })
     .populate({
       path: "classes",
@@ -25,15 +26,18 @@ exports.getData = async (req, res, next) => {
   if (teacher) {
     classes = teacher.classes;
     role = teacher.role.name;
+    user = teacher;
   } else {
     const staff = await Staff.findOne({ account: accountId }).populate("role");
     role = staff.role.name;
+    user = staff;
   }
 
   res.status(200).json({
     classes,
     subjects,
     semesters,
+    user,
     role,
     roles,
     grades,

@@ -5,6 +5,7 @@ const Teacher = require("../models/teacher");
 const Account = require("../models/account");
 const Subject = require("../models/subject");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
+const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/checkExist");
 
 exports.getTeachers = async (req, res, next) => {
   let queries;
@@ -63,9 +64,8 @@ exports.updateTeacher = async (req, res, next) => {
     }
 
     if (email.toLowerCase() !== teacher.email.toLowerCase()) {
-      const existingTeacher = await Teacher.find({ email });
-      if (existingTeacher) {
-        console.log("here");
+      const emailIsUsed = await checkEmailIsUsed(email);
+      if (emailIsUsed) {
         const error = new Error("Email đã được sử dụng");
         error.statusCode = 422;
         return next(error);
@@ -73,8 +73,8 @@ exports.updateTeacher = async (req, res, next) => {
     }
 
     if (phone !== teacher.phone) {
-      const existingTeacher = await Teacher.find({ phone });
-      if (existingTeacher) {
+      const phoneIsUsed = await checkPhoneIsUsed(phone);
+      if (phoneIsUsed) {
         const error = new Error("Số điện thoại đã được sử dụng");
         error.statusCode = 422;
         return next(error);

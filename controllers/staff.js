@@ -4,6 +4,7 @@ const bcryptjs = require("bcryptjs");
 const Staff = require("../models/staff");
 const Account = require("../models/account");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
+const { checkPhoneIsUsed, checkEmailIsUsed } = require("../util/checkExist");
 
 exports.getStaffs = async (req, res, next) => {
   try {
@@ -95,8 +96,8 @@ exports.updateStaff = async (req, res, next) => {
     }
 
     if (email.toLowerCase() !== staff.email.toLowerCase()) {
-      const existingStaff = await Staff.find({ email });
-      if (existingStaff) {
+      const emailIsUsed = await checkEmailIsUsed(email);
+      if (emailIsUsed) {
         const error = new Error("Email đã được sử dụng");
         error.statusCode = 422;
         return next(error);
@@ -104,8 +105,8 @@ exports.updateStaff = async (req, res, next) => {
     }
 
     if (phone !== staff.phone) {
-      const existingStaff = await Staff.find({ phone });
-      if (existingStaff) {
+      const phoneIsUsed = await checkPhoneIsUsed(phone);
+      if (phoneIsUsed) {
         const error = new Error("Số điện thoại đã được sử dụng");
         error.statusCode = 422;
         return next(error);

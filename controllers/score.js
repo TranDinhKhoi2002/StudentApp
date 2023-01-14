@@ -24,6 +24,27 @@ exports.getScores = async (req, res, next) => {
   }
 };
 
+exports.getAllScores = async (req, res, next) => {
+  try {
+    const classScore = await ClassScore.find().populate({
+      path: "studentScores",
+      populate: { path: "student" },
+    });
+
+    if (!classScore) {
+      const error = new Error("Không tìm thấy bảng điểm nào");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ classScore });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
 exports.updateScore = async (req, res, next) => {
   const { score, index, column, studentId, subjectId, semesterId, schoolYear } = req.body;
 
