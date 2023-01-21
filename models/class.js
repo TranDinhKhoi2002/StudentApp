@@ -18,7 +18,7 @@ const classSchema = new Schema({
   },
   schoolYear: {
     type: Number,
-    required: true,
+    default: new Date().getFullYear(),
   },
   semester: {
     type: Schema.Types.ObjectId,

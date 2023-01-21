@@ -8,7 +8,7 @@ const classController = require("../controllers/class");
 const Grade = require("../models/grade");
 const Teacher = require("../models/teacher");
 
-const classAuthentication = [
+const classValidation = [
   body("grade")
     .isMongoId()
     .withMessage("Mã khối không hợp lệ")
@@ -30,14 +30,13 @@ const classAuthentication = [
       });
     }),
   body("name").not().isEmpty().withMessage("Tên lớp không được rỗng"),
-  body("schoolYear").isNumeric().withMessage("Năm học phải là số"),
 ];
 
 router.get("/classes", isAuth, classController.getClasses);
 
-router.post("/classes", isAuth, classAuthentication, classController.createClass);
+router.post("/classes", isAuth, classValidation, classController.createClass);
 
-router.put("/classes/:classId", isAuth, classAuthentication, classController.updateClass);
+router.put("/classes/:classId", isAuth, classValidation, classController.updateClass);
 
 router.delete("/classes/:classId", isAuth, classController.deleteClass);
 

@@ -1,83 +1,42 @@
 const express = require("express");
-const { body } = require("express-validator");
 const router = express.Router();
+const { body } = require("express-validator");
 
-const teacherController = require("../controllers/teacher");
-const isAuth = require("../middleware/is-auth");
-const Account = require("../models/account");
-const Role = require("../models/role");
-const Subject = require("../models/subject");
 const Teacher = require("../models/teacher");
+const isAuth = require("../middleware/is-auth");
+const teacherController = require("../controllers/teacher");
 
 router.get("/teachers", isAuth, teacherController.getTeachers);
-
-router.get("/teachers/:teacherId", isAuth, teacherController.getTeacher);
-
-const teacherAuthentication = [
-  body("subject")
-    .isMongoId()
-    .withMessage("Mã môn học không hợp lệ")
-    .custom((value, { req }) => {
-      return Subject.findById(value).then((subjectDoc) => {
-        if (!subjectDoc) {
-          return Promise.reject("Môn học không tồn tại");
-        }
-      });
-    }),
-  body("role")
-    .isMongoId()
-    .withMessage("Mã vai trò không hợp lệ")
-    .custom((value, { req }) => {
-      return Role.findById(value).then((roleDoc) => {
-        if (
-          !roleDoc ||
-          roleDoc.name !== "Giáo viên chủ nhiệm" ||
-          roleDoc.name !== "Giáo viên bộ môn"
-        ) {
-          return Promise.reject("Vai trò không hợp lệ");
-        }
-      });
-    }),
-  body("name", "Tên không được để trống").trim().notEmpty(),
-  body("address", "Địa chỉ không được để trống").trim().notEmpty(),
-  body("email")
-    .isEmail()
-    .withMessage("Email không hợp lệ")
-    .custom((value, { req }) => {
-      return Teacher.findOne({ email: value }).then((teacherDoc) => {
-        if (teacherDoc) {
-          return Promise.reject("Email đã tồn tại, vui lòng chọn email khác");
-        }
-      });
-    })
-    .normalizeEmail(),
-  body("phone", "Số điện thoại không hợp lệ").isMobilePhone("vi-VN"),
-  body("gender", "Giới tính không hợp lệ").custom((value, { req }) => {
-    if (value !== "Nam" || value !== "Nữ") {
-      return false;
-    }
-    return true;
-  }),
-  body("birthday", "Ngày sinh không hợp lệ").isDate(),
-];
 
 router.post(
   "/teachers",
   isAuth,
   [
-    body("username")
-      .trim()
-      .notEmpty()
-      .withMessage("Tên đăng nhập không được để trống")
+    body("name", "Tên không được để trống").trim().notEmpty(),
+    body("address", "Địa chỉ không được để trống").trim().notEmpty(),
+    body("email")
+      .isEmail()
+      .withMessage("Email không hợp lệ")
       .custom((value, { req }) => {
-        return Account.findOne({ username: value }).then((accountDoc) => {
-          if (accountDoc) {
-            return Promise.reject("Tên đăng nhập đã tồn tại");
+        return Teacher.findOne({ email: value }).then((teacherDoc) => {
+          if (teacherDoc) {
+            return Promise.reject("Email đã được sử dụng");
+          }
+        });
+      })
+      .normalizeEmail(),
+    body("phone", "Số điện thoại không hợp lệ")
+      .isMobilePhone("vi-VN")
+      .custom((value, { req }) => {
+        return Teacher.findOne({ phone: value }).then((teacherDoc) => {
+          if (teacherDoc) {
+            return Promise.reject("Số điện thoại đã được sử dụng");
           }
         });
       }),
-    body("password", "Mật khẩu không được để trống").trim().notEmpty(),
-    ...teacherAuthentication,
+    body("gender", "Giới tính không hợp lệ").isIn(["Nam", "Nữ"]),
+    body("status", "Trạng thái không hợp lệ").isIn(["Đang dạy", "Đã nghỉ"]),
+    body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
   ],
   teacherController.createTeacher
 );
@@ -85,7 +44,15 @@ router.post(
 router.put(
   "/teachers/:teacherId",
   isAuth,
-  teacherAuthentication,
+  [
+    body("name", "Tên không được để trống").notEmpty().trim(),
+    body("address", "Địa chỉ không được để trống").trim().notEmpty(),
+    body("email").isEmail().withMessage("Email không hợp lệ").normalizeEmail(),
+    body("phone", "Số điện thoại không hợp lệ").isMobilePhone("vi-VN"),
+    body("gender", "Giới tính không hợp lệ").isIn(["Nam", "Nữ"]),
+    body("status", "Trạng thái không hợp lệ").isIn(["Đang dạy", "Đã nghỉ"]),
+    body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
+  ],
   teacherController.updateTeacher
 );
 

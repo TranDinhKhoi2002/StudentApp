@@ -35,7 +35,7 @@ exports.createClass = async (req, res, next) => {
     currentTeacher.classes.push(_class._id);
     await currentTeacher.save();
 
-    res.status(201).json({ message: "Thêm lớp thành công" });
+    res.status(201).json({ message: "Thêm lớp thành công", newClass: _class });
   } catch (err) {
     const error = new Error(err.message);
     error.statusCode = 500;
@@ -52,7 +52,7 @@ exports.updateClass = async (req, res, next) => {
     return next(error);
   }
 
-  const { grade, teacher, name, schoolYear } = req.body;
+  const { grade, teacher, name } = req.body;
   const classId = req.params.classId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -64,9 +64,17 @@ exports.updateClass = async (req, res, next) => {
 
     const updatedClass = await Class.findById(classId);
     updatedClass.grade = grade;
-    updatedClass.teacher = teacher;
     updatedClass.name = name;
-    updatedClass.schoolYear = schoolYear;
+    if (updatedClass.teacher.toString() !== teacher) {
+      const oldTeacher = await Teacher.findById(updatedClass.teacher);
+      oldTeacher.classes.pull(classId);
+      await oldTeacher.save();
+
+      const newTeacher = await Teacher.findById(teacher);
+      newTeacher.classes.push(classId);
+      await newTeacher.save();
+      updatedClass.teacher = teacher;
+    }
     await updatedClass.save();
 
     res.status(201).json({ message: "Cập nhật lớp thành công" });
@@ -93,6 +101,10 @@ exports.deleteClass = async (req, res, next) => {
       return next(error);
     }
 
+    const currentTeacher = await Teacher.findById(_class.teacher);
+    currentTeacher.classes.pull(classId);
+    await currentTeacher.save();
+
     await Class.findByIdAndRemove(classId);
     res.status(200).json({ message: "Xoá lớp thành công" });
   } catch (err) {
@@ -116,5 +128,9 @@ exports.getClasses = async (req, res, next) => {
     }
 
     res.status(200).json({ classes });
-  } catch (err) {}
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
 };

@@ -7,21 +7,16 @@ const isAuth = require("../middleware/is-auth");
 
 router.get("/scores", isAuth, scoreController.getScores);
 
+router.get("/scores/all", isAuth, scoreController.getAllScores);
+
 router.patch(
   "/scores",
   isAuth,
   [
-    body("score")
-      .isFloat({ min: 0, max: 10 })
-      .withMessage("Điểm phải là số từ 0 đến 10"),
+    body("score").isFloat({ min: 0, max: 10 }).withMessage("Điểm phải là số từ 0 đến 10"),
     body("index").isFloat().withMessage("Lần kiểm tra phải là số"),
     body("column", "Cột điểm không hợp lệ").custom((value, { req }) => {
-      if (
-        value !== "m15" &&
-        value !== "m45" &&
-        value !== "oral" &&
-        value !== "final"
-      ) {
+      if (value !== "m15" && value !== "m45" && value !== "oral" && value !== "final") {
         return false;
       }
       return true;

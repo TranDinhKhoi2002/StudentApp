@@ -5,7 +5,7 @@ const staffSchema = new Schema({
   role: {
     type: Schema.Types.ObjectId,
     ref: "Role",
-    required: true,
+    default: "eceaeb84ea08fffc51217b3a",
   },
   account: {
     type: Schema.Types.ObjectId,
@@ -36,6 +36,11 @@ const staffSchema = new Schema({
   birthday: {
     type: Date,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["Đang làm", "Đã nghỉ"],
+    default: "Đang làm",
   },
 });
 
