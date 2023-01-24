@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const Class = require("../models/class");
 const Teacher = require("../models/teacher");
+const Subject = require("../models/subject");
 
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 
@@ -17,7 +18,9 @@ exports.createClass = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm lớp");
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm lớp"
+      );
       error.statusCode = 401;
       return next(error);
     }
@@ -57,7 +60,9 @@ exports.updateClass = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh");
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được thêm học sinh"
+      );
       error.statusCode = 401;
       return next(error);
     }
@@ -128,6 +133,119 @@ exports.getClasses = async (req, res, next) => {
     }
 
     res.status(200).json({ classes });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.addLesson = async (req, res, next) => {
+  const { subjectId, teacherId, dayOfWeek, startPeriod, endPeriod } = req.body;
+  const classId = req.params.classId;
+  try {
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
+    if (!isAuthorized) {
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
+      );
+      error.statusCode = 401;
+      return next(error);
+    }
+    const updatedClass = await Class.findById(classId);
+    const chosenSubject = await Subject.findById(subjectId);
+    const chosenTeacher = await Teacher.findById(teacherId);
+    for (let i = startPeriod - 1; i < endPeriod; i++) {
+      updatedClass.schedule[i][dayOfWeek] = {
+        subjectId: chosenSubject._id,
+        teacherId: chosenTeacher._id,
+        subject: chosenSubject.name,
+        teacher: chosenTeacher.name,
+      };
+      chosenTeacher.schedule[i][dayOfWeek] = {
+        classId: updatedClass._id,
+        className: updatedClass.name,
+      };
+    }
+    await updatedClass.save();
+    res.status(201).json({
+      message: "Cập nhật thời khóa biểu thành công",
+      schedule: updatedClass.schedule,
+    });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.updateLesson = async (req, res, next) => {
+  const { subjectId, teacherId, dayOfWeek, period } = req.body;
+  const classId = req.params.classId;
+  try {
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
+    if (!isAuthorized) {
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
+      );
+      error.statusCode = 401;
+      return next(error);
+    }
+    const updatedClass = await Class.findById(classId);
+    const chosenSubject = await Subject.findById(subjectId);
+    const chosenTeacher = await Teacher.findById(teacherId);
+    const prevTeacher = await Teacher.findById(
+      updatedClass.schedule[period - 1][dayOfWeek].teacherId
+    );
+    prevTeacher.schedule[period - 1][dayOfWeek] = null;
+    updatedClass.schedule[period - 1][dayOfWeek] = {
+      subjectId: chosenSubject._id,
+      teacherId: chosenTeacher._id,
+      subject: chosenSubject.name,
+      teacher: chosenTeacher.name,
+    };
+    chosenTeacher.schedule[period - 1][dayOfWeek] = {
+      classId: updatedClass._id,
+      className: updatedClass.name,
+    };
+    await prevTeacher.save();
+    await updatedClass.save();
+    await chosenTeacher.save();
+    res.status(201).json({
+      message: "Cập nhật thời khóa biểu thành công",
+      schedule: updatedClass.schedule,
+    });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.deleteLesson = async (req, res, next) => {
+  const { dayOfWeek, period } = req.body;
+  const classId = req.params.classId;
+  try {
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
+    if (!isAuthorized) {
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
+      );
+      error.statusCode = 401;
+      return next(error);
+    }
+    const updatedClass = await Class.findById(classId);
+    const prevTeacher = await Teacher.findById(
+      updatedClass.schedule[period - 1][dayOfWeek].teacherId
+    );
+    prevTeacher.schedule[period - 1][dayOfWeek] = null;
+    updatedClass.schedule[period - 1][dayOfWeek] = null;
+    await prevTeacher.save();
+    await updatedClass.save();
+    res.status(201).json({
+      message: "Cập nhật thời khóa biểu thành công",
+      schedule: updatedClass.schedule,
+    });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;

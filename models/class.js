@@ -32,6 +32,18 @@ const classSchema = new Schema({
       required: true,
     },
   ],
+  schedule: [
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null]
+  ],
 });
 
 module.exports = mongoose.model("Class", classSchema);

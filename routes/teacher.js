@@ -7,6 +7,7 @@ const isAuth = require("../middleware/is-auth");
 const teacherController = require("../controllers/teacher");
 
 router.get("/teachers", isAuth, teacherController.getTeachers);
+router.post("/available-teachers", isAuth, teacherController.getAvailableTeachers);
 
 router.post(
   "/teachers",

@@ -44,8 +44,6 @@ const subjectRoutes = require("./routes/subject");
 const teacherRoutes = require("./routes/teacher");
 const staffRoutes = require("./routes/staff");
 const dataRoutes = require("./routes/data");
-const teacherRoutes = require("./routes/teacher");
-const staffRoutes = require("./routes/staff");
 const profileRoutes = require("./routes/profile");
 
 // const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
@@ -61,8 +59,6 @@ app.use(studentRoutes);
 app.use(classRoutes);
 app.use(scoreRoutes);
 app.use(subjectRoutes);
-app.use(teacherRoutes);
-app.use(staffRoutes);
 app.use(dataRoutes);
 app.use(teacherRoutes);
 app.use(staffRoutes);

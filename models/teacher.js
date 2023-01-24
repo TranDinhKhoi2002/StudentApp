@@ -48,6 +48,18 @@ const teacherSchema = new Schema({
     // enum: ["Đang dạy, Đã nghỉ"],
     default: "Đang dạy",
   },
+  schedule: [
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+  ],
 });
 
 module.exports = mongoose.model("Teacher", teacherSchema);
