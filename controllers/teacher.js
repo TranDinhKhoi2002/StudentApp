@@ -4,6 +4,7 @@ const bcryptjs = require("bcryptjs");
 const Teacher = require("../models/teacher");
 const Account = require("../models/account");
 const Subject = require("../models/subject");
+const Schedule = require("../models/schedule");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/checkExist");
 
@@ -37,12 +38,19 @@ exports.getTeachers = async (req, res, next) => {
 };
 
 exports.getAvailableTeachers = async (req, res, next) => {
-  const { subjectId, dayOfWeek, startPeriod, endPeriod } = req.body;
+  const {
+    subjectId,
+    dayOfWeek,
+    startPeriod,
+    endPeriod,
+    schoolYear,
+    semesterId,
+  } = req.body;
   try {
     const requiredSubject = await Subject.findById(subjectId).populate({
       path: "teachers",
       match: { status: "Đang dạy" },
-      select: "name schedule",
+      select: "name",
     });
     if (!requiredSubject) {
       const error = new Error("Môn học không tồn tại");
@@ -52,13 +60,22 @@ exports.getAvailableTeachers = async (req, res, next) => {
     const availableTeachers = [];
     for (let teacher of requiredSubject.teachers) {
       var isAvailable = true;
+      const teacherSchedule = await Schedule.findOne({
+        teacher: teacher._id,
+        schoolYear: schoolYear,
+        semester: semesterId,
+      });
       for (let i = startPeriod - 1; i < endPeriod; i++) {
-        if (teacher.schedule[i][dayOfWeek] != null) {
+        if (teacherSchedule.lessons[i][dayOfWeek] != null) {
           isAvailable = false;
           break;
         }
       }
-      if (isAvailable == true) availableTeachers.push({ name: teacher.name });
+      if (isAvailable == true)
+        availableTeachers.push({
+          teacherName: teacher.name,
+          teacherId: teacher._id,
+        });
     }
     res.status(200).json({ availableTeachers });
   } catch (err) {

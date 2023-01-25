@@ -38,12 +38,6 @@ router.post("/classes", isAuth, classValidation, classController.createClass);
 
 router.put("/classes/:classId", isAuth, classValidation, classController.updateClass);
 
-router.put("/schedule/add-lesson/:classId", isAuth, classController.addLesson);
-
-router.put("/schedule/update-lesson/:classId", isAuth, classController.updateLesson);
-
-router.put("/schedule/delete-lesson/:classId", isAuth, classController.deleteLesson);
-
 router.delete("/classes/:classId", isAuth, classController.deleteClass);
 
 module.exports = router;
