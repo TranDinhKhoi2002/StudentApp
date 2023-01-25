@@ -65,6 +65,14 @@ exports.getAvailableTeachers = async (req, res, next) => {
         schoolYear: schoolYear,
         semester: semesterId,
       });
+      if(!teacherSchedule){
+        teacherSchedule = new Schedule({
+          teacher: teacherId,
+          schoolYear: schoolYear,
+          semester: semesterId,
+        });
+        await teacherSchedule.save();
+      }
       for (let i = startPeriod - 1; i < endPeriod; i++) {
         if (teacherSchedule.lessons[i][dayOfWeek] != null) {
           isAvailable = false;
