@@ -4,10 +4,10 @@ const router = express.Router();
 const isAuth = require("../middleware/is-auth");
 const scheduleController = require("../controllers/schedule");
 
-router.post("/schedule/:classId", isAuth, scheduleController.getClassSchedule);
+router.post("/schedule/class/:classId", isAuth, scheduleController.getClassSchedule);
 
 router.post(
-  "/schedule/:teacherId",
+  "/schedule/teacher/:teacherId",
   isAuth,
   scheduleController.getTeacherSchedule
 );
