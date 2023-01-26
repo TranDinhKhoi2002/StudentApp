@@ -30,7 +30,7 @@ exports.getClassSchedule = async (req, res, next) => {
       schedule: _schedule,
     });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }
@@ -57,7 +57,7 @@ exports.getTeacherSchedule = async (req, res, next) => {
       schedule: _schedule,
     });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }
@@ -79,7 +79,7 @@ exports.addLesson = async (req, res, next) => {
       "class",
       "name schoolYear"
     );
-    const teacherSchedule = await Schedule.find({
+    let teacherSchedule = await Schedule.find({
       teacher: teacherId,
       schoolYear: updatedSchedule.class.schoolYear,
       semester: updatedSchedule.semester,
@@ -113,7 +113,7 @@ exports.addLesson = async (req, res, next) => {
       schedule: updatedSchedule,
     });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }
@@ -142,7 +142,7 @@ exports.updateLesson = async (req, res, next) => {
     });
     const chosenSubject = await Subject.findById(subjectId);
     const chosenTeacher = await Teacher.findById(teacherId);
-    const teacherSchedule = await Schedule.findOne({
+    let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
@@ -174,7 +174,7 @@ exports.updateLesson = async (req, res, next) => {
       schedule: updatedSchedule,
     });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }
@@ -207,7 +207,7 @@ exports.deleteLesson = async (req, res, next) => {
       schedule: updatedSchedule,
     });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error(err.message);
     error.statusCode = 500;
     next(error);
   }

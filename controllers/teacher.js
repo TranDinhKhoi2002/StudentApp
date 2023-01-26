@@ -60,7 +60,7 @@ exports.getAvailableTeachers = async (req, res, next) => {
     const availableTeachers = [];
     for (let teacher of requiredSubject.teachers) {
       var isAvailable = true;
-      const teacherSchedule = await Schedule.findOne({
+      let teacherSchedule = await Schedule.findOne({
         teacher: teacher._id,
         schoolYear: schoolYear,
         semester: semesterId,
@@ -74,12 +74,12 @@ exports.getAvailableTeachers = async (req, res, next) => {
         await teacherSchedule.save();
       }
       for (let i = startPeriod - 1; i < endPeriod; i++) {
-        if (teacherSchedule.lessons[i][dayOfWeek] != null) {
+        if (teacherSchedule.lessons[i] && teacherSchedule.lessons[i][dayOfWeek]) {
           isAvailable = false;
           break;
         }
       }
-      if (isAvailable == true)
+      if (isAvailable)
         availableTeachers.push({
           teacherName: teacher.name,
           teacherId: teacher._id,
@@ -220,6 +220,7 @@ exports.createTeacher = async (req, res, next) => {
     await teacher.save();
     const existingSubject = await Subject.findById(subject);
     existingSubject.teachers.push(teacher);
+    await existingSubject.save();
     res.status(200).json({ message: "Tạo giáo viên thành công" });
   } catch (err) {
     console.log(err);
