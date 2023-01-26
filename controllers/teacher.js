@@ -74,7 +74,7 @@ exports.getAvailableTeachers = async (req, res, next) => {
         await teacherSchedule.save();
       }
       for (let i = startPeriod - 1; i < endPeriod; i++) {
-        if (teacherSchedule.lessons[i] && teacherSchedule.lessons[i][dayOfWeek]) {
+        if (teacherSchedule.lessons[i][dayOfWeek] != null) {
           isAvailable = false;
           break;
         }

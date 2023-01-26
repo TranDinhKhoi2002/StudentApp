@@ -3,6 +3,7 @@ const Subject = require("../models/subject");
 const Schedule = require("../models/schedule");
 
 const { checkStaffAndPrincipalRole, getRole } = require("../util/roles");
+const teacher = require("../models/teacher");
 
 exports.getClassSchedule = async (req, res, next) => {
   const { semesterId } = req.body;
@@ -48,13 +49,21 @@ exports.getTeacherSchedule = async (req, res, next) => {
       error.statusCode = 401;
       return next(error);
     }
-    const _schedule = await Schedule.findOne({
+    let _schedule = await Schedule.findOne({
       teacher: teacherId,
       schoolYear: schoolYear,
       semester: semesterId,
     });
+    if(!_schedule){
+      _schedule = new Schedule({
+        teacher: teacherId,
+        schoolYear: schoolYear,
+        semester: semesterId,
+      });
+      await _schedule.save();
+    }
     res.status(200).json({
-      schedule: _schedule,
+      _schedule,
     });
   } catch (err) {
     const error = new Error(err.message);
@@ -77,17 +86,18 @@ exports.addLesson = async (req, res, next) => {
     }
     const updatedSchedule = await Schedule.findById(scheduleId).populate(
       "class",
-      "name schoolYear"
+      "name"
     );
-    let teacherSchedule = await Schedule.find({
+    
+    let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
-      schoolYear: updatedSchedule.class.schoolYear,
+      schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
     if(!teacherSchedule){
       teacherSchedule = new Schedule({
         teacher: teacherId,
-        schoolYear: updatedSchedule.class.schoolYear,
+        schoolYear: updatedSchedule.schoolYear,
         semester: updatedSchedule.semester,
       });
       await teacherSchedule.save();
@@ -106,6 +116,8 @@ exports.addLesson = async (req, res, next) => {
         className: updatedSchedule.class.name,
       };
     }
+    updatedSchedule.markModified('lessons');
+    teacherSchedule.markModified('lessons');
     await updatedSchedule.save();
     await teacherSchedule.save();
     res.status(201).json({
@@ -150,7 +162,7 @@ exports.updateLesson = async (req, res, next) => {
     if (!teacherSchedule) {
       teacherSchedule = new Schedule({
         teacher: teacherId,
-        schoolYear: updatedSchedule.class.schoolYear,
+        schoolYear: updatedSchedule.schoolYear,
         semester: updatedSchedule.semester,
       });
       await teacherSchedule.save();
@@ -166,6 +178,9 @@ exports.updateLesson = async (req, res, next) => {
       classId: updatedSchedule.class._id,
       className: updatedSchedule.class.name,
     };
+    updatedSchedule.markModified('lessons');
+    prevTeacherSchedule.markModified('lessons');
+    teacherSchedule.markModified('lessons');
     await updatedSchedule.save();
     await prevTeacherSchedule.save();
     await teacherSchedule.save();
@@ -200,6 +215,8 @@ exports.deleteLesson = async (req, res, next) => {
     });
     prevTeacherSchedule.lessons[period - 1][dayOfWeek] = null;
     updatedSchedule.lessons[period - 1][dayOfWeek] = null;
+    prevTeacherSchedule.markModified('lessons');
+    updatedSchedule.markModified('lessons');
     await prevTeacherSchedule.save();
     await updatedSchedule.save();
     res.status(201).json({

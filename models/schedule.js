@@ -19,6 +19,7 @@ const scheduleSchema = new Schema({
     required: true,
   },
   lessons: {
+    type: Schema.Types.Array,
     default: [
       [null, null, null, null, null, null],
       [null, null, null, null, null, null],
