@@ -105,6 +105,15 @@ exports.addLesson = async (req, res, next) => {
     const chosenSubject = await Subject.findById(subjectId);
     const chosenTeacher = await Teacher.findById(teacherId);
     for (let i = startPeriod - 1; i < endPeriod; i++) {
+      if(updatedSchedule.lessons[i][dayOfWeek] != null){
+        const error = new Error(
+          "Tiết học đã tồn tại"
+        );
+        error.statusCode = 401;
+        return next(error);
+      }
+    }
+    for (let i = startPeriod - 1; i < endPeriod; i++) {
       updatedSchedule.lessons[i][dayOfWeek] = {
         subjectId: chosenSubject._id,
         teacherId: chosenTeacher._id,
