@@ -1,6 +1,8 @@
 const ClassScore = require("../models/classScore");
 const StudentScore = require("../models/studentScore");
 
+const { sum } = require("lodash");
+
 exports.getScores = async (req, res, next) => {
   try {
     const classScore = await ClassScore.find({
@@ -56,12 +58,15 @@ exports.updateScore = async (req, res, next) => {
       return next(error);
     }
 
-    const { oral, m15, m45, final, average } = scores;
+    const { oral, m15, m45, final } = scores;
     studentScore.scores.oral = oral;
     studentScore.scores.m15 = m15;
     studentScore.scores.m45 = m45;
     studentScore.scores.final = final;
-    studentScore.scores.average = average;
+    studentScore.scores.average = (
+      (sum(oral) + sum(m15) + sum(m45) * 2 + sum(final) * 3) /
+      (oral.length + m15.length + m45.length * 2 + 3)
+    ).toFixed(2);
     await studentScore.save();
 
     res.status(201).json({ message: "Cập nhật điểm thành công" });
