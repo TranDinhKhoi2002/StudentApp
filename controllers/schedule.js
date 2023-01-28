@@ -221,11 +221,15 @@ exports.updateLesson = async (req, res, next) => {
       };
     }
     updatedSchedule.markModified("lessons");
-    prevTeacherSchedule.markModified("lessons");
-    teacherSchedule.markModified("lessons");
     await updatedSchedule.save();
-    await prevTeacherSchedule.save();
+    teacherSchedule.markModified("lessons");
     await teacherSchedule.save();
+    console.log(prevTeacherSchedule._id);
+    console.log(teacherSchedule._id);
+    if (!prevTeacherSchedule._id.equals(teacherSchedule._id)) {
+      prevTeacherSchedule.markModified("lessons");
+      await prevTeacherSchedule.save();
+    }
     res.status(201).json({
       message: "Cập nhật thời khóa biểu thành công",
       schedule: updatedSchedule,
