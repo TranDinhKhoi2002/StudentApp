@@ -5,6 +5,7 @@ const Teacher = require("../models/teacher");
 const Account = require("../models/account");
 const Subject = require("../models/subject");
 const Schedule = require("../models/schedule");
+const Class = require("../models/class");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/checkExist");
 
@@ -65,9 +66,9 @@ exports.getAvailableTeachers = async (req, res, next) => {
         schoolYear: schoolYear,
         semester: semesterId,
       });
-      if(!teacherSchedule){
+      if (!teacherSchedule) {
         teacherSchedule = new Schedule({
-          teacher: teacherId,
+          teacher: teacher._id,
           schoolYear: schoolYear,
           semester: semesterId,
         });
@@ -251,7 +252,7 @@ exports.deleteTeacher = async (req, res, next) => {
     }
 
     if (teacher.classes.length > 0) {
-      Class.find(
+      await Class.find(
         {
           _id: { $in: teacher.classes },
           schoolYear: new Date().getFullYear(),
