@@ -54,7 +54,7 @@ exports.getTeacherSchedule = async (req, res, next) => {
       schoolYear: schoolYear,
       semester: semesterId,
     });
-    if(!_schedule){
+    if (!_schedule) {
       _schedule = new Schedule({
         teacher: teacherId,
         schoolYear: schoolYear,
@@ -88,13 +88,13 @@ exports.addLesson = async (req, res, next) => {
       "class",
       "name"
     );
-    
+
     let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
-    if(!teacherSchedule){
+    if (!teacherSchedule) {
       teacherSchedule = new Schedule({
         teacher: teacherId,
         schoolYear: updatedSchedule.schoolYear,
@@ -105,10 +105,8 @@ exports.addLesson = async (req, res, next) => {
     const chosenSubject = await Subject.findById(subjectId);
     const chosenTeacher = await Teacher.findById(teacherId);
     for (let i = startPeriod - 1; i < endPeriod; i++) {
-      if(updatedSchedule.lessons[i][dayOfWeek] != null){
-        const error = new Error(
-          "Tiết học đã tồn tại"
-        );
+      if (updatedSchedule.lessons[i][dayOfWeek] != null) {
+        const error = new Error("Tiết học đã tồn tại");
         error.statusCode = 401;
         return next(error);
       }
@@ -125,8 +123,8 @@ exports.addLesson = async (req, res, next) => {
         className: updatedSchedule.class.name,
       };
     }
-    updatedSchedule.markModified('lessons');
-    teacherSchedule.markModified('lessons');
+    updatedSchedule.markModified("lessons");
+    teacherSchedule.markModified("lessons");
     await updatedSchedule.save();
     await teacherSchedule.save();
     res.status(201).json({
@@ -141,7 +139,15 @@ exports.addLesson = async (req, res, next) => {
 };
 
 exports.updateLesson = async (req, res, next) => {
-  const { subjectId, teacherId, dayOfWeek, period } = req.body;
+  const {
+    subjectId,
+    teacherId,
+    dayOfWeek,
+    prevStartPeriod,
+    prevEndPeriod,
+    startPeriod,
+    endPeriod,
+  } = req.body;
   const scheduleId = req.params.scheduleId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -156,13 +162,39 @@ exports.updateLesson = async (req, res, next) => {
       "class",
       "name"
     );
+    const chosenTeacher = await Teacher.findById(teacherId);
+    var isValid = true;
+    // check if there is any other lesson
+    for (let i = startPeriod - 1; i < endPeriod; i++) {
+      if (i >= prevStartPeriod - 1 && i < prevEndPeriod) {
+        continue;
+      }
+      if (
+        updatedSchedule.lessons[i][dayOfWeek] != null &&
+        updatedSchedule.lessons[i][dayOfWeek].teacherId != chosenTeacher._id
+      ) {
+        isValid = false;
+        break;
+      }
+    }
+    if (!isValid) {
+      const error = new Error("Tiết học đã tồn tại");
+      error.statusCode = 401;
+      return next(error);
+    }
+    // delete previous lessons
     const prevTeacherSchedule = await Schedule.findOne({
-      teacher: updatedSchedule.lessons[period - 1][dayOfWeek].teacherId,
+      teacher:
+        updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
+    for (let i = prevStartPeriod - 1; i < prevEndPeriod; i++) {
+      updatedSchedule.lessons[i][dayOfWeek] = null;
+      prevTeacherSchedule.lessons[i][dayOfWeek] = null;
+    }
+    // add new lessons
     const chosenSubject = await Subject.findById(subjectId);
-    const chosenTeacher = await Teacher.findById(teacherId);
     let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
       schoolYear: updatedSchedule.schoolYear,
@@ -176,20 +208,21 @@ exports.updateLesson = async (req, res, next) => {
       });
       await teacherSchedule.save();
     }
-    prevTeacherSchedule.lessons[period - 1][dayOfWeek] = null;
-    updatedSchedule.lessons[period - 1][dayOfWeek] = {
-      subjectId: chosenSubject._id,
-      teacherId: chosenTeacher._id,
-      subject: chosenSubject.name,
-      teacher: chosenTeacher.name,
-    };
-    teacherSchedule.lessons[period - 1][dayOfWeek] = {
-      classId: updatedSchedule.class._id,
-      className: updatedSchedule.class.name,
-    };
-    updatedSchedule.markModified('lessons');
-    prevTeacherSchedule.markModified('lessons');
-    teacherSchedule.markModified('lessons');
+    for (let i = startPeriod - 1; i < endPeriod; i++) {
+      updatedSchedule.lessons[i][dayOfWeek] = {
+        subjectId: chosenSubject._id,
+        teacherId: chosenTeacher._id,
+        subject: chosenSubject.name,
+        teacher: chosenTeacher.name,
+      };
+      teacherSchedule.lessons[i][dayOfWeek] = {
+        classId: updatedSchedule.class._id,
+        className: updatedSchedule.class.name,
+      };
+    }
+    updatedSchedule.markModified("lessons");
+    prevTeacherSchedule.markModified("lessons");
+    teacherSchedule.markModified("lessons");
     await updatedSchedule.save();
     await prevTeacherSchedule.save();
     await teacherSchedule.save();
@@ -205,7 +238,7 @@ exports.updateLesson = async (req, res, next) => {
 };
 
 exports.deleteLesson = async (req, res, next) => {
-  const { dayOfWeek, period } = req.body;
+  const { dayOfWeek, startPeriod, endPeriod } = req.body;
   const scheduleId = req.params.scheduleId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -218,14 +251,16 @@ exports.deleteLesson = async (req, res, next) => {
     }
     const updatedSchedule = await Schedule.findById(scheduleId);
     const prevTeacherSchedule = await Schedule.findOne({
-      teacher: updatedSchedule.lessons[period - 1][dayOfWeek].teacherId,
+      teacher: updatedSchedule.lessons[startPeriod - 1][dayOfWeek].teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
-    prevTeacherSchedule.lessons[period - 1][dayOfWeek] = null;
-    updatedSchedule.lessons[period - 1][dayOfWeek] = null;
-    prevTeacherSchedule.markModified('lessons');
-    updatedSchedule.markModified('lessons');
+    for (let i = startPeriod - 1; i < endPeriod; i++) {
+      prevTeacherSchedule.lessons[i][dayOfWeek] = null;
+      updatedSchedule.lessons[i][dayOfWeek] = null;
+    }
+    prevTeacherSchedule.markModified("lessons");
+    updatedSchedule.markModified("lessons");
     await prevTeacherSchedule.save();
     await updatedSchedule.save();
     res.status(201).json({
