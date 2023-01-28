@@ -46,30 +46,25 @@ exports.getAllScores = async (req, res, next) => {
 };
 
 exports.updateScore = async (req, res, next) => {
-  const { score, index, column, studentId, subjectId, semesterId, schoolYear } = req.body;
+  const { classScoreId, studentId, scores } = req.body;
 
   try {
-    const transcriptSubject = await StudentScore.findOne({
-      student: studentId,
-      subject: subjectId,
-      semester: semesterId,
-      schoolYear: schoolYear,
-    });
-
-    if (!transcriptSubject) {
-      const error = new Error("Không tìm thấy bảng điểm nào");
+    const studentScore = await StudentScore.findOne({ classScore: classScoreId, student: studentId });
+    if (!studentScore) {
+      const error = new Error("Điểm của học sinh không tồn tại");
       error.statusCode = 404;
       return next(error);
     }
 
-    if (index >= transcriptSubject.scores[column].length) {
-      const error = new Error("Vị trí của điểm cần sửa không hợp lệ");
-      error.statusCode = 422;
-      return next(error);
-    }
+    const { oral, m15, m45, final, average } = scores;
+    studentScore.scores.oral = oral;
+    studentScore.scores.m15 = m15;
+    studentScore.scores.m45 = m45;
+    studentScore.scores.final = final;
+    studentScore.scores.average = average;
+    await studentScore.save();
 
-    transcriptSubject.scores[column][index] = score;
-    res.status(200).json({ message: "Cập nhật điểm thành công" });
+    res.status(201).json({ message: "Cập nhật điểm thành công" });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;

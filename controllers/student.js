@@ -2,8 +2,10 @@ const { validationResult } = require("express-validator");
 
 const Student = require("../models/student");
 const Class = require("../models/class");
+const Parameter = require("../models/parameter");
 
 const { checkStaffAndPrincipalRole } = require("../util/roles");
+const { CLASS_SIZE, AGE_OF_ADMISSION } = require("../constants/parameter");
 
 exports.createStudent = async (req, res, next) => {
   const errors = validationResult(req);
@@ -28,6 +30,21 @@ exports.createStudent = async (req, res, next) => {
     if (!selectedClass) {
       const error = new Error("Lớp không tồn tại");
       error.statusCode = 422;
+      return next(error);
+    }
+
+    const classSizeRegulation = await Parameter.findOne({ name: CLASS_SIZE });
+    if (selectedClass.students.length >= classSizeRegulation.max) {
+      const error = new Error("Sỉ số lớp học vượt quá mức quy định");
+      error.statusCode = 403;
+      return next(error);
+    }
+
+    const currentAge = new Date().getFullYear() - new Date(birthday).getFullYear();
+    const ageRegulation = await Parameter.findOne({ name: AGE_OF_ADMISSION });
+    if (currentAge < ageRegulation.min || currentAge > ageRegulation.max) {
+      const error = new Error("Học sinh nằm ngoài độ tuổi cho phép để nhập học");
+      error.statusCode = 403;
       return next(error);
     }
 
@@ -63,7 +80,7 @@ exports.updateStudent = async (req, res, next) => {
   }
 
   const studentId = req.params.studentId;
-  const { className, name, gender, birthday, address, email, phone, status } = req.body;
+  const { className, name, gender, birthday, address, email, phone, conduct, status } = req.body;
 
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
@@ -115,6 +132,7 @@ exports.updateStudent = async (req, res, next) => {
     student.address = address;
     student.email = email;
     student.phone = phone;
+    student.conduct = conduct;
     student.status = status;
     await student.save();
 
