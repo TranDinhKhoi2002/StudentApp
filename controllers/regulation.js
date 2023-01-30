@@ -1,5 +1,8 @@
 const { validationResult } = require("express-validator");
+const { SUBJECT_PASSING_SCORE } = require("../constants/parameter");
+
 const Parameter = require("../models/parameter");
+const Subject = require("../models/subject");
 
 exports.getRegulations = async (req, res, next) => {
   try {
@@ -73,6 +76,15 @@ exports.updateRegulation = async (req, res, next) => {
     currentRegulation.min = min;
     currentRegulation.max = max;
     await currentRegulation.save();
+
+    if (name === SUBJECT_PASSING_SCORE) {
+      const subjects = await Subject.find();
+
+      for (const subject of subjects) {
+        subject.passScore = min;
+        await subject.save();
+      }
+    }
 
     res.status(201).json({ message: "Thay đổi quy định thành công" });
   } catch (err) {

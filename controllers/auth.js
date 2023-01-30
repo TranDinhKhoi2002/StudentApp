@@ -60,18 +60,7 @@ exports.signup = async (req, res, next) => {
     return next(error);
   }
 
-  const {
-    username,
-    password,
-    subject,
-    role,
-    name,
-    address,
-    email,
-    phone,
-    gender,
-    birthday,
-  } = req.body;
+  const { username, password, subject, role, name, address, email, phone, gender, birthday } = req.body;
 
   try {
     const existingAccount = await Account.findOne({ username });
@@ -124,9 +113,7 @@ exports.resetPassword = async (req, res, next) => {
 
   crypto.randomBytes(32, async (err, buffer) => {
     if (err) {
-      return res
-        .status(500)
-        .json({ message: "Có lỗi xảy ra, vui lòng thử lại sau" });
+      return res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại sau" });
     }
 
     const token = buffer.toString("hex");
@@ -151,7 +138,7 @@ exports.resetPassword = async (req, res, next) => {
       sgMail.send({
         to: req.body.email,
         from: "20520224@gm.uit.edu.vn",
-        templateId: process.env.SG_TEMPLATE_ID,
+        templateId: process.env.SG_RESET_PASSWORD_TEMPLATE_ID,
         dynamicTemplateData: {
           token: token,
         },
@@ -180,9 +167,7 @@ exports.changePassword = async (req, res, next) => {
     });
 
     if (!account) {
-      return res
-        .status(404)
-        .json({ message: "Tài khoản không tồn tại hoặc link đã hết thời hạn" });
+      return res.status(404).json({ message: "Tài khoản không tồn tại hoặc link đã hết thời hạn" });
     }
 
     const hashedPassword = bcryptjs.hashSync(newPassword, 12);
