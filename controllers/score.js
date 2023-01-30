@@ -2,6 +2,7 @@ const ClassScore = require("../models/classScore");
 const StudentScore = require("../models/studentScore");
 
 const { sum } = require("lodash");
+const { checkScoreIsValid } = require("../util/validate");
 
 exports.getScores = async (req, res, next) => {
   try {
@@ -66,6 +67,13 @@ exports.updateScore = async (req, res, next) => {
     }
 
     const { oral, m15, m45, final } = scores;
+
+    if (!checkScoreIsValid(oral) || !checkScoreIsValid(m15) || !checkScoreIsValid(m45) || final < 0 || final > 10) {
+      const error = new Error("Điểm phải nằm trong khoảng từ 0 đến 10");
+      error.statusCode = 422;
+      return next(error);
+    }
+
     studentScore.scores.oral = oral;
     studentScore.scores.m15 = m15;
     studentScore.scores.m45 = m45;

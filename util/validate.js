@@ -26,3 +26,10 @@ exports.checkPhoneIsUsed = async (phone) => {
 
   return false;
 };
+
+exports.checkScoreIsValid = (scores) => {
+  if (scores.find((score) => score < 0 || score > 10)) {
+    return false;
+  }
+  return true;
+};
