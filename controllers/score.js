@@ -52,7 +52,7 @@ exports.updateScore = async (req, res, next) => {
   const { classScoreId, studentId, scores } = req.body;
 
   try {
-    const classScore = await ClassScore.findById(classScoreId);
+    const classScore = await ClassScore.findById(classScoreId).populate("studentScores");
     if (!classScore) {
       const error = new Error("Bảng điểm không tồn tại");
       error.statusCode = 404;
