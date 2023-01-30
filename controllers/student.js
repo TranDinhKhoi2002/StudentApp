@@ -260,13 +260,13 @@ exports.rankStudents = async (req, res, next) => {
       const finalAverage = ((firstSemesterAverage + secondSemesterAverage) / 2).toFixed(2);
 
       const student = await Student.findById(averageScoresInFirstSemester[index].student);
-      if (finalAverage > 8) {
+      if (finalAverage >= 8) {
         student.type = "Giỏi";
-      } else if (finalAverage > 6.5) {
+      } else if (finalAverage >= 6.5) {
         student.type = "Khá";
-      } else if (finalAverage > 5) {
+      } else if (finalAverage >= 5) {
         student.type = "Trung bình";
-      } else if (finalAverage > 3.5) {
+      } else if (finalAverage >= 3.5) {
         student.type = "Yếu";
       } else {
         student.type = "Kém";

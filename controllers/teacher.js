@@ -5,7 +5,7 @@ const Teacher = require("../models/teacher");
 const Account = require("../models/account");
 const Subject = require("../models/subject");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
-const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/checkExist");
+const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/validate");
 
 exports.getTeachers = async (req, res, next) => {
   let queries;

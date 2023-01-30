@@ -52,13 +52,6 @@ exports.updateScore = async (req, res, next) => {
   const { classScoreId, studentId, scores } = req.body;
 
   try {
-    const classScore = await ClassScore.findById(classScoreId).populate("studentScores");
-    if (!classScore) {
-      const error = new Error("Bảng điểm không tồn tại");
-      error.statusCode = 404;
-      return next(error);
-    }
-
     const studentScore = await StudentScore.findOne({ classScore: classScoreId, student: studentId });
     if (!studentScore) {
       const error = new Error("Điểm của học sinh không tồn tại");
@@ -83,6 +76,16 @@ exports.updateScore = async (req, res, next) => {
       (oral.length + m15.length + m45.length * 2 + 3)
     ).toFixed(2);
     await studentScore.save();
+
+    const classScore = await ClassScore.findById(classScoreId).populate({
+      path: "studentScores",
+      populate: { path: "student" },
+    });
+    if (!classScore) {
+      const error = new Error("Bảng điểm không tồn tại");
+      error.statusCode = 404;
+      return next(error);
+    }
 
     res.status(201).json({ message: "Cập nhật điểm thành công", classScore });
   } catch (err) {
