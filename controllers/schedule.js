@@ -63,7 +63,7 @@ exports.getTeacherSchedule = async (req, res, next) => {
       await _schedule.save();
     }
 
-    res.status(200).json({ _schedule });
+    res.status(200).json({ schedule: _schedule });
   } catch (err) {
     const error = new Error(err.message);
     error.statusCode = 500;
