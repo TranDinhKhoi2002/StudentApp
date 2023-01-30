@@ -17,7 +17,7 @@ exports.getTeachers = async (req, res, next) => {
     queries = { ...req.query, classes: { $in: req.query.classes } };
   }
   try {
-    const teachers = await Teacher.find({ ...queries, status: "Đang dạy" })
+    const teachers = await Teacher.find({ ...queries })
       .populate("subject")
       .populate("role")
       .populate("account")

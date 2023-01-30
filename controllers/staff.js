@@ -8,7 +8,7 @@ const { checkPhoneIsUsed, checkEmailIsUsed } = require("../util/validate");
 
 exports.getStaffs = async (req, res, next) => {
   try {
-    const staffs = await Staff.find({ ...req.query, status: "Đang làm" })
+    const staffs = await Staff.find({ ...req.query })
       .populate("role")
       .populate("account");
     if (!staffs) {
