@@ -46,7 +46,7 @@ exports.getStatisticsByYear = async (req, res, next) => {
       return next(error);
     }
 
-    const statistic = [];
+    const statistic = {};
     const classes = await Class.find({ schoolYear: year })
       .populate("grade")
       .populate("students", "type");
