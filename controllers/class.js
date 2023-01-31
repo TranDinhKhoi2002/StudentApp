@@ -2,9 +2,9 @@ const { validationResult } = require("express-validator");
 const Class = require("../models/class");
 const Teacher = require("../models/teacher");
 const Subject = require("../models/subject");
+const Schedule = require("../models/schedule");
 const ClassScore = require("../models/classScore");
 const Semester = require("../models/semester");
-const Schedule = require("../models/schedule");
 
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 

@@ -2,8 +2,7 @@ const Teacher = require("../models/teacher");
 const Subject = require("../models/subject");
 const Schedule = require("../models/schedule");
 
-const { checkStaffAndPrincipalRole, getRole, checkTeacherRole } = require("../util/roles");
-const teacher = require("../models/teacher");
+const { checkStaffAndPrincipalRole, getRole } = require("../util/roles");
 
 exports.getClassSchedule = async (req, res, next) => {
   const { semesterId } = req.body;
@@ -43,11 +42,10 @@ exports.getClassSchedule = async (req, res, next) => {
 exports.getTeacherSchedule = async (req, res, next) => {
   const { schoolYear, semesterId } = req.body;
   const teacherId = req.params.teacherId;
-
+  const teacherAccount = await Teacher.findById(teacherId);
   try {
-    const isAuthorized = await checkTeacherRole(req.accountId);
-    if (!isAuthorized && teacherId != req.accountId) {
-      const error = new Error("Chỉ có giáo viên bộ môn hoặc giáo viên chủ nhiệm mới được xem thời khóa biểu");
+    if (teacherAccount.account != req.accountId) {
+      const error = new Error("Tài khoản không có quyền truy cập");
       error.statusCode = 401;
       return next(error);
     }
@@ -56,14 +54,23 @@ exports.getTeacherSchedule = async (req, res, next) => {
       teacher: teacherId,
       schoolYear: schoolYear,
       semester: semesterId,
-    });
+    })
+      .populate("teacher", "name")
+      .populate("semester", "name");
     if (!_schedule) {
-      _schedule = new Schedule({
+      newSchedule = new Schedule({
         teacher: teacherId,
         schoolYear: schoolYear,
         semester: semesterId,
       });
-      await _schedule.save();
+      await newSchedule.save();
+      _schedule = await Schedule.findOne({
+        teacher: teacherId,
+        schoolYear: schoolYear,
+        semester: semesterId,
+      })
+        .populate("teacher", "name")
+        .populate("semester", "name");
     }
 
     res.status(200).json({ schedule: _schedule });
@@ -80,11 +87,16 @@ exports.addLesson = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
+      );
       error.statusCode = 401;
       return next(error);
     }
-    const updatedSchedule = await Schedule.findById(scheduleId).populate("class", "name");
+    const updatedSchedule = await Schedule.findById(scheduleId).populate(
+      "class",
+      "name"
+    );
 
     let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
@@ -120,6 +132,10 @@ exports.addLesson = async (req, res, next) => {
         className: updatedSchedule.class.name,
       };
     }
+    if (!chosenTeacher.classes.includes(updatedSchedule.class._id)) {
+      chosenTeacher.classes.push(updatedSchedule.class._id);
+      await chosenTeacher.save();
+    }
     updatedSchedule.markModified("lessons");
     teacherSchedule.markModified("lessons");
     await updatedSchedule.save();
@@ -136,16 +152,29 @@ exports.addLesson = async (req, res, next) => {
 };
 
 exports.updateLesson = async (req, res, next) => {
-  const { subjectId, teacherId, dayOfWeek, prevStartPeriod, prevEndPeriod, startPeriod, endPeriod } = req.body;
+  const {
+    subjectId,
+    teacherId,
+    dayOfWeek,
+    prevStartPeriod,
+    prevEndPeriod,
+    startPeriod,
+    endPeriod,
+  } = req.body;
   const scheduleId = req.params.scheduleId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
+      );
       error.statusCode = 401;
       return next(error);
     }
-    const updatedSchedule = await Schedule.findById(scheduleId).populate("class", "name");
+    const updatedSchedule = await Schedule.findById(scheduleId).populate(
+      "class",
+      "name"
+    );
     const chosenTeacher = await Teacher.findById(teacherId);
     var isValid = true;
     // check if there is any other lesson
@@ -168,7 +197,8 @@ exports.updateLesson = async (req, res, next) => {
     }
     // delete previous lessons
     const prevTeacherSchedule = await Schedule.findOne({
-      teacher: updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
+      teacher:
+        updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
@@ -176,6 +206,8 @@ exports.updateLesson = async (req, res, next) => {
       updatedSchedule.lessons[i][dayOfWeek] = null;
       prevTeacherSchedule.lessons[i][dayOfWeek] = null;
     }
+    prevTeacherSchedule.markModified("lessons");
+    await prevTeacherSchedule.save();
     // add new lessons
     const chosenSubject = await Subject.findById(subjectId);
     let teacherSchedule = await Schedule.findOne({
@@ -207,11 +239,26 @@ exports.updateLesson = async (req, res, next) => {
     await updatedSchedule.save();
     teacherSchedule.markModified("lessons");
     await teacherSchedule.save();
-    console.log(prevTeacherSchedule._id);
-    console.log(teacherSchedule._id);
     if (!prevTeacherSchedule._id.equals(teacherSchedule._id)) {
-      prevTeacherSchedule.markModified("lessons");
-      await prevTeacherSchedule.save();
+      if (!chosenTeacher.classes.includes(updatedSchedule.class._id)) {
+        chosenTeacher.classes.push(updatedSchedule.class._id);
+        await chosenTeacher.save();
+      }
+      var isTeaching = false;
+      for (let period of updatedSchedule.lessons) {
+        for (let day of period) {
+          if (day != null && day.teacherId == prevTeacherSchedule.teacher) {
+            isTeaching = true;
+            break;
+          }
+        }
+        if (isTeaching) break;
+      }
+      if (!isTeaching) {
+        const prevTeacher = await Teacher.findById(prevTeacherSchedule.teacher);
+        prevTeacher.classes.pull(updatedSchedule.class._id);
+        await prevTeacher.save();
+      }
     }
     res.status(201).json({
       message: "Cập nhật thời khóa biểu thành công",
@@ -230,7 +277,9 @@ exports.deleteLesson = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
+      const error = new Error(
+        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
+      );
       error.statusCode = 401;
       return next(error);
     }
@@ -248,6 +297,21 @@ exports.deleteLesson = async (req, res, next) => {
     updatedSchedule.markModified("lessons");
     await prevTeacherSchedule.save();
     await updatedSchedule.save();
+    var isTeaching = false;
+    for (let period of updatedSchedule.lessons) {
+      for (let day of period) {
+        if (day != null && day.teacherId == prevTeacherSchedule.teacher) {
+          isTeaching = true;
+          break;
+        }
+      }
+      if (isTeaching) break;
+    }
+    if (!isTeaching) {
+      const prevTeacher = await Teacher.findById(prevTeacherSchedule.teacher);
+      prevTeacher.classes.pull(updatedSchedule.class._id);
+      await prevTeacher.save();
+    }
     res.status(201).json({
       message: "Cập nhật thời khóa biểu thành công",
       schedule: updatedSchedule,

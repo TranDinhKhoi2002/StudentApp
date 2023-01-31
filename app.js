@@ -45,8 +45,9 @@ const teacherRoutes = require("./routes/teacher");
 const staffRoutes = require("./routes/staff");
 const dataRoutes = require("./routes/data");
 const profileRoutes = require("./routes/profile");
-const regulationsRoutes = require("./routes/regulation");
 const scheduleRoutes = require("./routes/schedule");
+const regulationsRoutes = require("./routes/regulation");
+const dashboardRoutes = require('./routes/dashboard')
 
 // const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
 // const privateKey = fs.readFileSync("server.key");
@@ -65,8 +66,9 @@ app.use(dataRoutes);
 app.use(teacherRoutes);
 app.use(staffRoutes);
 app.use(profileRoutes);
-app.use(regulationsRoutes);
 app.use(scheduleRoutes);
+app.use(regulationsRoutes);
+app.use(dashboardRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, data, validationErrors } = err;
