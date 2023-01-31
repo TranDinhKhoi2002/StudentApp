@@ -8,6 +8,7 @@ const teacher = require("../models/teacher");
 exports.getClassSchedule = async (req, res, next) => {
   const { semesterId } = req.body;
   const classId = req.params.classId;
+
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     const roleName = await getRole(req.accountId);
@@ -18,15 +19,17 @@ exports.getClassSchedule = async (req, res, next) => {
       error.statusCode = 401;
       return next(error);
     }
-    const _schedule = await Schedule.findOne({
-      class: classId,
-      semester: semesterId,
-    });
+
+    const _schedule = await Schedule.findOne({ class: classId, semester: semesterId })
+      .populate("class")
+      .populate("teacher")
+      .populate("semester");
     if (!_schedule) {
       const error = new Error("Không tìm thấy thời khóa biểu");
       error.statusCode = 404;
       return next(error);
     }
+
     res.status(200).json({
       schedule: _schedule,
     });
