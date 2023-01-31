@@ -14,7 +14,7 @@ exports.checkStaffAndPrincipalRole = async (accountId) => {
 };
 
 exports.checkPrincipalRole = async (accountId) => {
-  const existingTeacher = await Teacher.findOne({
+  const existingTeacher = await Staff.findOne({
     account: accountId,
   }).populate("role");
 
