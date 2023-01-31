@@ -5,7 +5,7 @@ const Class = require("../models/class");
 const Parameter = require("../models/parameter");
 const ClassScore = require("../models/classScore");
 
-const { checkStaffAndPrincipalRole } = require("../util/roles");
+const { checkStaffAndPrincipalRole, getRole } = require("../util/roles");
 const { CLASS_SIZE, AGE_OF_ADMISSION } = require("../constants/parameter");
 const { getAverageScoresInSemester } = require("../util/student");
 
@@ -85,9 +85,9 @@ exports.updateStudent = async (req, res, next) => {
   const { className, name, gender, birthday, address, email, phone, conduct, status } = req.body;
 
   try {
-    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
-    if (!isAuthorized) {
-      const error = new Error("Chỉ có nhân viên giáo vụ mới được cập nhật thông tin học sinh");
+    const role = await getRole(req.accountId);
+    if (role === "Giáo viên bộ môn") {
+      const error = new Error("Giáo viên bộ môn không thể cập nhật thông tin học sinh");
       error.statusCode = 401;
       return next(error);
     }
