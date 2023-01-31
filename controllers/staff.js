@@ -4,11 +4,11 @@ const bcryptjs = require("bcryptjs");
 const Staff = require("../models/staff");
 const Account = require("../models/account");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
-const { checkPhoneIsUsed, checkEmailIsUsed } = require("../util/checkExist");
+const { checkPhoneIsUsed, checkEmailIsUsed } = require("../util/validate");
 
 exports.getStaffs = async (req, res, next) => {
   try {
-    const staffs = await Staff.find({ ...req.query, status: "Đang làm" })
+    const staffs = await Staff.find({ ...req.query })
       .populate("role")
       .populate("account");
     if (!staffs) {

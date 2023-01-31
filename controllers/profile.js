@@ -1,6 +1,6 @@
 const Staff = require("../models/staff");
 const Teacher = require("../models/teacher");
-const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/checkExist");
+const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/validate");
 
 exports.updateProfile = async (req, res, next) => {
   const accountId = req.accountId;
