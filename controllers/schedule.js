@@ -115,6 +115,10 @@ exports.addLesson = async (req, res, next) => {
         className: updatedSchedule.class.name,
       };
     }
+    if(!chosenTeacher.classes.includes(updatedSchedule.class._id)){
+      chosenTeacher.classes.push(updatedSchedule.class._id);
+      await chosenTeacher.save();
+    }
     updatedSchedule.markModified("lessons");
     teacherSchedule.markModified("lessons");
     await updatedSchedule.save();
@@ -202,11 +206,28 @@ exports.updateLesson = async (req, res, next) => {
     await updatedSchedule.save();
     teacherSchedule.markModified("lessons");
     await teacherSchedule.save();
-    console.log(prevTeacherSchedule._id);
-    console.log(teacherSchedule._id);
     if (!prevTeacherSchedule._id.equals(teacherSchedule._id)) {
       prevTeacherSchedule.markModified("lessons");
       await prevTeacherSchedule.save();
+      if (!chosenTeacher.classes.includes(updatedSchedule.class._id)) {
+        chosenTeacher.classes.push(updatedSchedule.class._id);
+        await chosenTeacher.save();
+      }
+      var isTeaching = false;
+      for(let period of updatedSchedule.lessons){
+        for(let day of period){
+          if(day!=null && day.teacherId == prevTeacherSchedule.teacher){
+            isTeaching = true;
+            break;
+          }
+        }
+        if(isTeaching) break;
+      }
+      if(!isTeaching){
+        const prevTeacher = await Teacher.findById(prevTeacherSchedule.teacher);
+        prevTeacher.classes.pull(updatedSchedule.class._id);
+        await prevTeacher.save();
+      }
     }
     res.status(201).json({
       message: "Cập nhật thời khóa biểu thành công",
@@ -243,6 +264,21 @@ exports.deleteLesson = async (req, res, next) => {
     updatedSchedule.markModified("lessons");
     await prevTeacherSchedule.save();
     await updatedSchedule.save();
+    var isTeaching = false;
+    for (let period of updatedSchedule.lessons) {
+      for (let day of period) {
+        if (day != null && day.teacherId == prevTeacherSchedule.teacher) {
+          isTeaching = true;
+          break;
+        }
+      }
+      if (isTeaching) break;
+    }
+    if (!isTeaching) {
+      const prevTeacher = await Teacher.findById(prevTeacherSchedule.teacher);
+      prevTeacher.classes.pull(updatedSchedule.class._id);
+      await prevTeacher.save();
+    }
     res.status(201).json({
       message: "Cập nhật thời khóa biểu thành công",
       schedule: updatedSchedule,
