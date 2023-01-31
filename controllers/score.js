@@ -6,12 +6,14 @@ const { checkScoreIsValid } = require("../util/validate");
 
 exports.getScores = async (req, res, next) => {
   try {
-    const classScore = await ClassScore.find({
-      ...req.query,
-    }).populate({
-      path: "studentScores",
-      populate: { path: "student" },
-    });
+    const classScore = await ClassScore.find({ ...req.query })
+      .populate({
+        path: "studentScores",
+        populate: { path: "student" },
+      })
+      .populate("class")
+      .populate("semester")
+      .populate("subject");
 
     if (!classScore) {
       const error = new Error("Không tìm thấy bảng điểm nào");
