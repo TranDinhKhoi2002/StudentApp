@@ -9,7 +9,7 @@ const Student = require("../models/student");
 
 router.get("/students", isAuth, studentController.getAllStudents);
 
-router.get("/students/:classId", isAuth, studentController.getStudentsByClassId);
+router.get("/students/class/:classId", isAuth, studentController.getStudentsByClassId);
 
 router.get("/students/:studentId", isAuth, studentController.getStudent);
 
@@ -62,5 +62,7 @@ router.put(
 );
 
 router.delete("/students/:studentId", isAuth, studentController.deleteStudent);
+
+router.post("/students/ranking", isAuth, studentController.rankStudents);
 
 module.exports = router;

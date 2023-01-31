@@ -45,6 +45,7 @@ const teacherRoutes = require("./routes/teacher");
 const staffRoutes = require("./routes/staff");
 const dataRoutes = require("./routes/data");
 const profileRoutes = require("./routes/profile");
+const regulationsRoutes = require("./routes/regulation");
 const scheduleRoutes = require("./routes/schedule");
 
 // const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
@@ -64,6 +65,7 @@ app.use(dataRoutes);
 app.use(teacherRoutes);
 app.use(staffRoutes);
 app.use(profileRoutes);
+app.use(regulationsRoutes);
 app.use(scheduleRoutes);
 
 app.use((err, req, res, next) => {

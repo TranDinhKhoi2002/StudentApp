@@ -32,6 +32,14 @@ const studentSchema = new Schema({
     type: String,
     required: true,
   },
+  conduct: {
+    type: String,
+    enum: ["Tốt", "Khá", "Trung bình", "Yếu"],
+  },
+  type: {
+    type: String,
+    enum: ["Giỏi", "Khá", "Trung bình", "Yếu", "Kém"],
+  },
   status: {
     type: String,
     enum: ["Đang học", "Đã tốt nghiệp", "Đã nghỉ học"],

@@ -2,8 +2,9 @@ const { validationResult } = require("express-validator");
 const Class = require("../models/class");
 const Teacher = require("../models/teacher");
 const Subject = require("../models/subject");
-const Schedule = require("../models/schedule");
+const ClassScore = require("../models/classScore");
 const Semester = require("../models/semester");
+const Schedule = require("../models/schedule");
 
 const { checkStaffAndPrincipalRole } = require("../util/roles");
 
@@ -33,6 +34,30 @@ exports.createClass = async (req, res, next) => {
       students: [],
     });
     await _class.save();
+
+    const subjects = await Subject.find();
+    const firstSemester = await Semester.findOne({ name: "Học kỳ 1" });
+    const secondSemester = await Semester.findOne({ name: "Học kỳ 2" });
+
+    for (const subject of subjects) {
+      const classScoreInFirstSemester = new ClassScore({
+        class: _class._id,
+        subject: subject._id,
+        semester: firstSemester._id,
+        schoolYear: new Date().getFullYear(),
+        studentScores: [],
+      });
+      await classScoreInFirstSemester.save();
+
+      const classScoreInSecondSemester = new ClassScore({
+        class: _class._id,
+        subject: subject._id,
+        semester: secondSemester._id,
+        schoolYear: new Date().getFullYear(),
+        studentScores: [],
+      });
+      await classScoreInSecondSemester.save();
+    }
     const semesters = await Semester.find();
     for (let semester of semesters) {
       const _schedule = new Schedule({

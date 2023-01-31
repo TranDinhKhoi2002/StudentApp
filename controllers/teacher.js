@@ -7,7 +7,7 @@ const Subject = require("../models/subject");
 const Schedule = require("../models/schedule");
 const Class = require("../models/class");
 const { checkStaffAndPrincipalRole } = require("../util/roles");
-const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/checkExist");
+const { checkEmailIsUsed, checkPhoneIsUsed } = require("../util/validate");
 
 exports.getTeachers = async (req, res, next) => {
   let queries;
@@ -19,7 +19,7 @@ exports.getTeachers = async (req, res, next) => {
     queries = { ...req.query, classes: { $in: req.query.classes } };
   }
   try {
-    const teachers = await Teacher.find({ ...queries, status: "Đang dạy" })
+    const teachers = await Teacher.find({ ...queries })
       .populate("subject")
       .populate("role")
       .populate("account")
