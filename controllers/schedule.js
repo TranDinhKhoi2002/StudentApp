@@ -175,6 +175,8 @@ exports.updateLesson = async (req, res, next) => {
       updatedSchedule.lessons[i][dayOfWeek] = null;
       prevTeacherSchedule.lessons[i][dayOfWeek] = null;
     }
+    prevTeacherSchedule.markModified("lessons");
+    await prevTeacherSchedule.save();
     // add new lessons
     const chosenSubject = await Subject.findById(subjectId);
     let teacherSchedule = await Schedule.findOne({
@@ -207,8 +209,6 @@ exports.updateLesson = async (req, res, next) => {
     teacherSchedule.markModified("lessons");
     await teacherSchedule.save();
     if (!prevTeacherSchedule._id.equals(teacherSchedule._id)) {
-      prevTeacherSchedule.markModified("lessons");
-      await prevTeacherSchedule.save();
       if (!chosenTeacher.classes.includes(updatedSchedule.class._id)) {
         chosenTeacher.classes.push(updatedSchedule.class._id);
         await chosenTeacher.save();
