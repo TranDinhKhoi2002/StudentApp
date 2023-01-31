@@ -93,8 +93,7 @@ exports.getStatisticsByYear = async (req, res, next) => {
         }
       }
     }
-    console.log(statistic);
-    res.status(200).json({ statistic: statistic });
+    res.status(200).json({ statistic });
   } catch (err) {
     const error = new Error(err.message);
     error.statusCode = 500;
