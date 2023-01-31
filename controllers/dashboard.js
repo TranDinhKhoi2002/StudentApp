@@ -4,13 +4,13 @@ const Staff = require("../models/staff");
 const Teacher = require("../models/teacher");
 const Grade = require("../models/grade");
 
-const { checkPrincipalRole } = require("../util/roles");
+const { checkStaffAndPrincipalRole } = require("../util/roles");
 
 exports.getStatistics = async (req, res, next) => {
   try {
-    const isAuthorized = await checkPrincipalRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có hiệu trưởng mới được xem số liệu trường");
+      const error = new Error("Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được xem số liệu trường");
       error.statusCode = 401;
       return next(error);
     }
@@ -39,9 +39,9 @@ exports.getStatistics = async (req, res, next) => {
 exports.getStatisticsByYear = async (req, res, next) => {
   const { year } = req.body;
   try {
-    const isAuthorized = await checkPrincipalRole(req.accountId);
+    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error("Chỉ có hiệu trưởng mới được xem số liệu trường");
+      const error = new Error("Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được xem số liệu trường");
       error.statusCode = 401;
       return next(error);
     }
