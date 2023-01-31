@@ -46,6 +46,7 @@ exports.getTeacherSchedule = async (req, res, next) => {
       error.statusCode = 401;
       return next(error);
     }
+
     let _schedule = await Schedule.findOne({
       teacher: teacherId,
       schoolYear: schoolYear,
@@ -59,9 +60,8 @@ exports.getTeacherSchedule = async (req, res, next) => {
       });
       await _schedule.save();
     }
-    res.status(200).json({
-      _schedule,
-    });
+
+    res.status(200).json({ schedule: _schedule });
   } catch (err) {
     const error = new Error(err.message);
     error.statusCode = 500;
@@ -75,16 +75,11 @@ exports.addLesson = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
       error.statusCode = 401;
       return next(error);
     }
-    const updatedSchedule = await Schedule.findById(scheduleId).populate(
-      "class",
-      "name"
-    );
+    const updatedSchedule = await Schedule.findById(scheduleId).populate("class", "name");
 
     let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
@@ -136,29 +131,16 @@ exports.addLesson = async (req, res, next) => {
 };
 
 exports.updateLesson = async (req, res, next) => {
-  const {
-    subjectId,
-    teacherId,
-    dayOfWeek,
-    prevStartPeriod,
-    prevEndPeriod,
-    startPeriod,
-    endPeriod,
-  } = req.body;
+  const { subjectId, teacherId, dayOfWeek, prevStartPeriod, prevEndPeriod, startPeriod, endPeriod } = req.body;
   const scheduleId = req.params.scheduleId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
       error.statusCode = 401;
       return next(error);
     }
-    const updatedSchedule = await Schedule.findById(scheduleId).populate(
-      "class",
-      "name"
-    );
+    const updatedSchedule = await Schedule.findById(scheduleId).populate("class", "name");
     const chosenTeacher = await Teacher.findById(teacherId);
     var isValid = true;
     // check if there is any other lesson
@@ -181,8 +163,7 @@ exports.updateLesson = async (req, res, next) => {
     }
     // delete previous lessons
     const prevTeacherSchedule = await Schedule.findOne({
-      teacher:
-        updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
+      teacher: updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
@@ -244,9 +225,7 @@ exports.deleteLesson = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
       error.statusCode = 401;
       return next(error);
     }
@@ -268,6 +247,25 @@ exports.deleteLesson = async (req, res, next) => {
       message: "Cập nhật thời khóa biểu thành công",
       schedule: updatedSchedule,
     });
+  } catch (err) {
+    const error = new Error(err.message);
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.createSchedule = async (req, res, next) => {
+  const { classId, semesterId } = req.body;
+
+  try {
+    const schedule = new Schedule({
+      class: classId,
+      semester: semesterId,
+      schoolYear: new Date().getFullYear(),
+    });
+    await schedule.save();
+
+    res.status(201).json({ schedule });
   } catch (err) {
     const error = new Error(err.message);
     error.statusCode = 500;
