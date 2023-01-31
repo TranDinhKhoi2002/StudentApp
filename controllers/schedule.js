@@ -3,7 +3,6 @@ const Subject = require("../models/subject");
 const Schedule = require("../models/schedule");
 
 const { checkStaffAndPrincipalRole, getRole } = require("../util/roles");
-const teacher = require("../models/teacher");
 
 exports.getClassSchedule = async (req, res, next) => {
   const { semesterId } = req.body;
@@ -40,12 +39,10 @@ exports.getClassSchedule = async (req, res, next) => {
 exports.getTeacherSchedule = async (req, res, next) => {
   const { schoolYear, semesterId } = req.body;
   const teacherId = req.params.teacherId;
+  const teacherAccount = await Teacher.findById(teacherId);
   try {
-    const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
-    if (!isAuthorized && teacherId != req.accountId) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ, hiệu trưởng mới được xem khóa biểu"
-      );
+    if (teacherAccount.account != req.accountId) {
+      const error = new Error("Tài khoản không có quyền truy cập");
       error.statusCode = 401;
       return next(error);
     }
