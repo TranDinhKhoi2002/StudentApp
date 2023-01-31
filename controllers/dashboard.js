@@ -47,12 +47,10 @@ exports.getStatisticsByYear = async (req, res, next) => {
     }
 
     const statistic = {};
-    const classes = await Class.find({ schoolYear: year })
-      .populate("grade")
-      .populate("students", "type");
+    const classes = await Class.find({ schoolYear: year }).populate("grade").populate("students", "type");
     const grades = await Grade.find().exec();
 
-    for (let grade of grades) {
+    for (const grade of grades) {
       statistic["Grade " + grade.name.toString()] = {
         excellentStudents: 0,
         goodStudents: 0,
@@ -62,33 +60,23 @@ exports.getStatisticsByYear = async (req, res, next) => {
       };
     }
 
-    for (let schoolClass of classes) {
-      for (let student of schoolClass.students) {
+    for (const schoolClass of classes) {
+      for (const student of schoolClass.students) {
         switch (student.type) {
           case "Giỏi":
-            statistic[
-              "Grade " + schoolClass.grade.name.toString()
-            ].excellentStudents += 1;
+            statistic["Grade " + schoolClass.grade.name.toString()].excellentStudents += 1;
             break;
           case "Khá":
-            statistic[
-              "Grade " + schoolClass.grade.name.toString()
-            ].goodStudents += 1;
+            statistic["Grade " + schoolClass.grade.name.toString()].goodStudents += 1;
             break;
           case "Trung bình":
-            statistic[
-              "Grade " + schoolClass.grade.name.toString()
-            ].averageStudents += 1;
+            statistic["Grade " + schoolClass.grade.name.toString()].averageStudents += 1;
             break;
           case "Yếu":
-            statistic[
-              "Grade " + schoolClass.grade.name.toString()
-            ].belowAverageStudents += 1;
+            statistic["Grade " + schoolClass.grade.name.toString()].belowAverageStudents += 1;
             break;
           case "Kém":
-            statistic[
-              "Grade " + schoolClass.grade.name.toString()
-            ].poorStudents += 1;
+            statistic["Grade " + schoolClass.grade.name.toString()].poorStudents += 1;
             break;
         }
       }
