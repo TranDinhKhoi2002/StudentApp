@@ -12,9 +12,6 @@ const regulationValidation = [
     .isNumeric()
     .withMessage("Giá trị tối đa phải là số")
     .custom((value, { req }) => {
-      // console.log(+req.body.min, +value);
-      // console.log(+req.body.min > +value);
-      console.log("here");
       if (+req.body.min > +value) {
         return Promise.reject("Giá trị tối thiểu phải nhỏ hơn hoặc bằng giá trị tối đa");
       }
