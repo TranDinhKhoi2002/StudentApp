@@ -4,6 +4,7 @@ const Student = require("../models/student");
 const Class = require("../models/class");
 const Parameter = require("../models/parameter");
 const ClassScore = require("../models/classScore");
+const StudentScore = require("../models/studentScore");
 
 const { checkStaffAndPrincipalRole, getRole } = require("../util/roles");
 const { CLASS_SIZE, AGE_OF_ADMISSION } = require("../constants/parameter");
@@ -63,6 +64,25 @@ exports.createStudent = async (req, res, next) => {
 
     selectedClass.students.push(student);
     await selectedClass.save();
+
+    const classScoresAllSubjects = await ClassScore.find({ class: className });
+    for (const classScore of classScoresAllSubjects) {
+      const studentScore = new StudentScore({
+        student: student._id,
+        classScore: classScore._id,
+        scores: {
+          oral: [],
+          m15: [],
+          m45: [],
+          final: null,
+          average: null,
+        },
+      });
+      await studentScore.save();
+
+      classScore.studentScores.push(studentScore);
+      await classScore.save();
+    }
 
     res.status(201).json({ message: "Thêm học sinh thành công" });
   } catch (err) {

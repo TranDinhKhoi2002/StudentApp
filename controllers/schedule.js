@@ -87,16 +87,11 @@ exports.addLesson = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
       error.statusCode = 401;
       return next(error);
     }
-    const updatedSchedule = await Schedule.findById(scheduleId).populate(
-      "class",
-      "name"
-    );
+    const updatedSchedule = await Schedule.findById(scheduleId).populate("class", "name");
 
     let teacherSchedule = await Schedule.findOne({
       teacher: teacherId,
@@ -152,29 +147,16 @@ exports.addLesson = async (req, res, next) => {
 };
 
 exports.updateLesson = async (req, res, next) => {
-  const {
-    subjectId,
-    teacherId,
-    dayOfWeek,
-    prevStartPeriod,
-    prevEndPeriod,
-    startPeriod,
-    endPeriod,
-  } = req.body;
+  const { subjectId, teacherId, dayOfWeek, prevStartPeriod, prevEndPeriod, startPeriod, endPeriod } = req.body;
   const scheduleId = req.params.scheduleId;
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
       error.statusCode = 401;
       return next(error);
     }
-    const updatedSchedule = await Schedule.findById(scheduleId).populate(
-      "class",
-      "name"
-    );
+    const updatedSchedule = await Schedule.findById(scheduleId).populate("class", "name");
     const chosenTeacher = await Teacher.findById(teacherId);
     var isValid = true;
     // check if there is any other lesson
@@ -197,8 +179,7 @@ exports.updateLesson = async (req, res, next) => {
     }
     // delete previous lessons
     const prevTeacherSchedule = await Schedule.findOne({
-      teacher:
-        updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
+      teacher: updatedSchedule.lessons[prevStartPeriod - 1][dayOfWeek].teacherId,
       schoolYear: updatedSchedule.schoolYear,
       semester: updatedSchedule.semester,
     });
@@ -277,9 +258,7 @@ exports.deleteLesson = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu"
-      );
+      const error = new Error("Chỉ có nhân viên giáo vụ hoặc hiệu trưởng mới được sửa thời khóa biểu");
       error.statusCode = 401;
       return next(error);
     }

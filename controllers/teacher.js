@@ -14,7 +14,7 @@ exports.getTeachers = async (req, res, next) => {
   if (!req.query.classes) {
     queries = { ...req.query };
   } else if (req.query.classes === "empty") {
-    queries = { ...req.query, classes: [] };
+    queries = { ...req.query, classes: [], status: "Đang dạy" };
   } else {
     queries = { ...req.query, classes: { $in: req.query.classes } };
   }
@@ -39,14 +39,7 @@ exports.getTeachers = async (req, res, next) => {
 };
 
 exports.getAvailableTeachers = async (req, res, next) => {
-  const {
-    subjectId,
-    dayOfWeek,
-    startPeriod,
-    endPeriod,
-    schoolYear,
-    semesterId,
-  } = req.body;
+  const { subjectId, dayOfWeek, startPeriod, endPeriod, schoolYear, semesterId } = req.body;
   try {
     const requiredSubject = await Subject.findById(subjectId).populate({
       path: "teachers",
@@ -103,25 +96,13 @@ exports.updateTeacher = async (req, res, next) => {
     return next(error);
   }
 
-  const {
-    name,
-    address,
-    email,
-    phone,
-    gender,
-    birthday,
-    status,
-    subject,
-    role,
-  } = req.body;
+  const { name, address, email, phone, gender, birthday, status, subject, role } = req.body;
   const teacherId = req.params.teacherId;
 
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được cập nhật thông tin giáo viên"
-      );
+      const error = new Error("Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được cập nhật thông tin giáo viên");
       error.statusCode = 401;
       return next(error);
     }
@@ -189,15 +170,12 @@ exports.createTeacher = async (req, res, next) => {
     return next(error);
   }
 
-  const { subject, role, name, address, email, phone, gender, birthday } =
-    req.body;
+  const { subject, role, name, address, email, phone, gender, birthday } = req.body;
 
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được thêm giáo viên"
-      );
+      const error = new Error("Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được thêm giáo viên");
       error.statusCode = 401;
       return next(error);
     }
@@ -237,9 +215,7 @@ exports.deleteTeacher = async (req, res, next) => {
   try {
     const isAuthorized = await checkStaffAndPrincipalRole(req.accountId);
     if (!isAuthorized) {
-      const error = new Error(
-        "Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được xóa giáo viên"
-      );
+      const error = new Error("Chỉ có hiệu trưởng hoặc nhân viên giáo vụ mới được xóa giáo viên");
       error.statusCode = 401;
       return next(error);
     }
